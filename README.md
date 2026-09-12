@@ -47,9 +47,9 @@ only. This repository states and proves that construction at every `k`, and inst
 
       alpha k P = (Σ ((k−1) log m + log t) / log H) / (1 + k Σ log m / log H).
 
-* **The two pools** (`KthPower.pool4_valid`, `KthPower.pool6_valid`). The eight blocks of `pool4`
+* **The two pools** (`KthPower.pool4_valid`, `KthPower.pool6_valid`). The nine blocks of `pool4`
   and the nine blocks of `pool6`, tabulated below, are pools for `k = 4` and `k = 6`; each of the
-  seventeen block conditions is checked in the Lean kernel by `decide`.
+  eighteen block conditions is checked in the Lean kernel by `decide`.
 
 * **The two instances** (`KthPower.fourth_power_liminf`, `KthPower.sixth_power_liminf`):
   `alpha 4 pool4 ≤ liminf log D_4(N)/log N` and `alpha 6 pool6 ≤ liminf log D_6(N)/log N`.
@@ -57,10 +57,10 @@ only. This repository states and proves that construction at every `k`, and inst
 * **Where the two exponents sit** (`KthPower.alpha4_gt_transfer`, `KthPower.alpha4_gt`,
   `KthPower.alpha6_gt_transfer`, `KthPower.alpha6_gt`). The values are
 
-      alpha 4 pool4 = 0.910358021185…       alpha 6 pool6 = 0.950738855746…
+      alpha 4 pool4 = 0.912145042700…       alpha 6 pool6 = 0.950825559086…
 
-  and the four theorems prove `(3 + log 6/log 17)/4 < alpha 4 pool4`, `0.9103 < alpha 4 pool4`,
-  `(5 + log 6/log 13)/6 < alpha 6 pool6` and `0.9507 < alpha 6 pool6`, each by exact comparisons of
+  and the four theorems prove `(3 + log 6/log 17)/4 < alpha 4 pool4`, `0.9121 < alpha 4 pool4`,
+  `(5 + log 6/log 13)/6 < alpha 6 pool6` and `0.9508 < alpha 6 pool6`, each by exact comparisons of
   natural powers — no floating-point and no interval arithmetic anywhere in the development.
 
 All ten are unconditional theorems, kernel-checked with no axioms beyond `propext`,
@@ -105,13 +105,15 @@ statement follows. The formula displays the trade directly: each block contribut
 `log(m^{k−1} t)` to the numerator and `k log m` to the denominator, both per unit of `log H`, and
 the isolated `1` in the denominator is the height's own cost.
 
-**Why the method exists exactly at even `k`.** The relation "`y − x` is a nonzero k-th-power
-residue" can only be a genuine *digraph* relation if it is antisymmetric, i.e. if `−1` is not a
-k-th-power residue. Modulo a prime `p` with `p − 1` divisible by `k`, `−1` is a k-th power exactly
-when `2k ∣ p − 1`; so at `k = 4` the usable primes are `p ≡ 5 (mod 8)` and at `k = 6` they are
-`p ≡ 7 (mod 12)`. Every modulus of the two pools is such a prime, and at every one of them
-`Q ∩ (−Q) = ∅`, so for distinct residues `x, y` at most one of `y − x`, `x − y` lies in `Q`: the
-arcs really are oriented, and a block can be large and still acyclic. At **odd** `k`, by contrast, `−1 = (−1)^k` is always a k-th-power residue, so
+**Why the method exists exactly at even `k`.** The cheapest source of arcs is antisymmetry: the
+relation "`y − x` is a nonzero k-th-power residue" is a genuine *digraph* relation whenever `−1` is
+not a k-th-power residue. Modulo a prime `p` with `p − 1` divisible by `k`, `−1` is a k-th power
+exactly when `2k ∣ p − 1`; so the primes with `Q ∩ (−Q) = ∅` are those `≡ 5 (mod 8)` at `k = 4`
+and those `≡ 7 (mod 12)` at `k = 6`. Every prime modulus of the two pools is of that kind — the
+eight primes `5, 13, 29, 37, 53, 61, 101, 109` of `pool4` and all nine moduli of `pool6` — and at
+each of them at most one of `y − x`, `x − y` lies in `Q` for distinct `x, y`: the arcs really are
+oriented, and a block can be large and still acyclic. At **odd** `k`, by contrast,
+`−1 = (−1)^k` is always a k-th-power residue, so
 `Q = −Q` and the relation is symmetric: an arc `x → y` would force `h(y) < h(x)` and `h(x) < h(y)`
 at once, so every valid block is an *independent* set. The general theorem is still true there,
 but it is then weaker than Ruzsa's transfer, whose denominator is `k log m` where this one has
@@ -123,42 +125,64 @@ the multiplicative group has order `k`, so `Q = {1}`, and the digraph on `ℤ/p`
 That is `(3, 2, 2)` at `k = 2`, `(5, 4, 4)` at `k = 4` and `(7, 6, 6)` at `k = 6` — the first row
 of each table below, and the highest-yield block of each pool.
 
+**A second source of acyclicity: intervals.** Antisymmetry is sufficient but not necessary. If
+`t ≤ m − max Q`, then any `t` consecutive residues form a block. For `x` before `y` in the
+interval the difference `y − x` lies in `{1, …, t−1}` and may or may not be an arc; for `y` before
+`x` it is one of `m−t+1, …, m−1`, every one of which exceeds `max Q` and so is not an arc at all.
+Every arc therefore runs forward in the interval order, which is itself a ranking, and the block
+is acyclic of height `t`. One block of `pool4` is of this kind, at the composite square-free
+modulus `51 = 3 · 17`: the fourth-power residues modulo `51` are
+`{1, 4, 13, 16, 18, 21, 30, 33, 34}`, with maximum `34`, so the `t = 51 − 34 = 17` consecutive
+residues `35, 36, …, 50, 0` form a block of height `17`, ranked `16, 15, …, 1, 0`. Neither reason
+above applies to it: `51` is not a prime of either congruence class (`3 ≡ 3 (mod 8)`,
+`17 ≡ 1 (mod 8)`), and the relation modulo `51` is not antisymmetric, since `18` and `−18 = 33`
+are both fourth-power residues. The interval argument is doing the work, and `ValidPool` asks for
+nothing more — square-free moduli, pairwise coprime, and a ranking. Its seventeen vertices are the
+largest ranked support at `51`.
+
 ## The two pools
 
 The blocks were found by computer search (see [DISCLOSURE.md](DISCLOSURE.md)); they are lower-bound
-witnesses, and nothing here claims that any support is largest possible or any height least
-possible. `H` is the height actually stored and verified — the number of rank values the block
-uses. `log_p t` is the yield of the block read as a residue set, for comparison with the transfer
-exponent `(k − 1 + log_p t)/k`.
+witnesses, and nothing here claims maximality as a theorem — no statement in Lean asserts that any
+support is largest possible or any height least possible. As context: the sizes at
+`5, 13, 29, 37, 51, 53, 61` for `k = 4` and at `7, 19, 31, 43` for `k = 6` are exact maxima, by
+exhaustive search outside Lean; at the larger moduli the sizes are the best the search reached.
+`H` is the height actually stored and verified — the number of rank values the block uses, which
+for every block here is the length of a longest path in its digraph. `log_m t` is the yield of the
+block read as a residue set, for comparison with the transfer exponent `(k − 1 + log_m t)/k`.
 
-**`pool4` (`k = 4`, eight blocks, 109 vertices in all; every `p ≡ 5 mod 8`).**
+**`pool4` (`k = 4`, nine blocks, 126 vertices in all; the eight prime moduli are `≡ 5 mod 8`, and
+`51 = 3 · 17` is the interval block).**
 
-| `p` | `t` | `H` | `log_p t` |
+| `m` | `t` | `H` | `log_m t` |
 | --- | --- | --- | --- |
 | 5 | 4 | 4 | 0.861353 |
 | 13 | 7 | 4 | 0.758654 |
 | 29 | 12 | 11 | 0.737953 |
 | 37 | 13 | 11 | 0.710332 |
+| 51 | 17 | 17 | 0.720585 |
 | 53 | 16 | 8 | 0.698334 |
 | 61 | 16 | 10 | 0.674452 |
 | 101 | 20 | 12 | 0.649112 |
 | 109 | 21 | 8 | 0.648965 |
 
-**`pool6` (`k = 6`, nine blocks, 196 vertices in all; every `p ≡ 7 mod 12`).**
+**`pool6` (`k = 6`, nine blocks, 196 vertices in all; every modulus a prime `≡ 7 mod 12`).**
 
-| `p` | `t` | `H` | `log_p t` |
+| `m` | `t` | `H` | `log_m t` |
 | --- | --- | --- | --- |
 | 7 | 6 | 6 | 0.920782 |
 | 19 | 10 | 3 | 0.782011 |
 | 31 | 15 | 9 | 0.788602 |
 | 43 | 18 | 6 | 0.768471 |
-| 67 | 23 | 15 | 0.745713 |
+| 67 | 23 | 14 | 0.745713 |
 | 79 | 27 | 17 | 0.754291 |
 | 103 | 30 | 13 | 0.733850 |
-| 127 | 33 | 13 | 0.721794 |
-| 139 | 34 | 29 | 0.714638 |
+| 127 | 33 | 9 | 0.721794 |
+| 139 | 34 | 22 | 0.714638 |
 
-The vertex lists and the rank of each vertex are in [Challenge.lean](Challenge.lean).
+The nine moduli of `pool4` are pairwise coprime even though `51` is composite: `3` and `17` occur
+in no other block. The vertex lists and the rank of each vertex are in
+[Challenge.lean](Challenge.lean).
 
 ## What the exponents are compared against
 
@@ -168,7 +192,7 @@ Corollary at `k = 6`: `d_k ≥ 1 − 1/k + log k/(k log p(2k))` with `p(12) = 13
 modulo `13` are `{1, 12}`, and `{0, 2, 4, 6, 8, 10}` avoids them, maximally (again an exhaustive
 check outside the formal development). Ruzsa printed only the
 `k = 3` and `k = 5` instances (`0.854858…` and `0.934237…`), but `0.949759…` is his value, not a
-new one. `alpha 6 pool6 = 0.950738855746…` exceeds it by `9.80 × 10⁻⁴`.
+new one. `alpha 6 pool6 = 0.950825559086…` exceeds it by `1.07 × 10⁻³`.
 
 **`k = 4`.** Two rungs have to be distinguished. Ruzsa's Corollary at `k = 4` gives
 `1 − 1/4 + log 4/(4 log 17) = 0.872325271059…` (`p(8) = 17`, `r = 4`), and that is the only
@@ -182,8 +206,8 @@ modulo `17` are `{1, 4, 13, 16}`, and
 has no two elements whose difference is one of them, and six is the maximum, by exhaustive check
 over all subsets of `ℤ/17`. Both of those are computations outside the formal development — the
 Lean theorem mentions only the real number `(3 + log 6/log 17)/4`; see the "Not checked here"
-section of [VERIFICATION.md](VERIFICATION.md). `alpha 4 pool4 = 0.910358021185…` exceeds that
-unpublished rung by `2.25 × 10⁻³`, and the published rung by `3.80 × 10⁻²`. The theorem in Lean is
+section of [VERIFICATION.md](VERIFICATION.md). `alpha 4 pool4 = 0.912145042700…` exceeds that
+unpublished rung by `4.04 × 10⁻³`, and the published rung by `3.98 × 10⁻²`. The theorem in Lean is
 the comparison against the `0.908103…` rung, the harder of the two.
 
 **For context, the rest of the landscape.** The best published exponent for cubes is Lewko's
@@ -206,7 +230,7 @@ Lovász, *On the Shannon capacity of a graph*, IEEE Trans. Inform. Theory **25**
 its eigenvalues (Gauss periods), and the Weil bound shows `log_p ϑ` decreases for large `p`; evaluating
 the maximum over primes — a computation, not a theorem, and not checked in Lean — puts it at
 `p = 41` for `k = 4` and `p = 157` for `k = 6`, and the ceiling at `0.924871` for `k = 4` and
-`0.956627` for `k = 6`. The exponents proved here, `0.910358…` and `0.950739…`, are still below
+`0.956627` for `k = 6`. The exponents proved here, `0.912145…` and `0.950826…`, are still below
 those two numbers — but they are not bound by them, because the blocks of a pool are acyclic
 vertex sets, not independent ones, and the theta bound does not apply to them. That is the
 structural reason to expect the directed method to go further than any residue-set transfer can.
@@ -221,7 +245,7 @@ structural reason to expect the directed method to go further than any residue-s
   `DiffMod` (the residue-difference toolkit), `RankedBlocks` (the functional form of a block),
   `LemmaA` (digits and the composite lift), `LemmaB` (words and the passage to integers),
   `LemmaC` (the Chinese-remainder glue), `Construction` (the stage moduli, sizes and heights),
-  `Asymptotics` (the allocation, the limit, and the passage to all `N`), `Pools` (the seventeen
+  `Asymptotics` (the allocation, the limit, and the passage to all `N`), `Pools` (the eighteen
   block verifications), `Numeric` (the exponent inequalities), `Main` (the ten targets).
 * [Test/Axioms.lean](Test/Axioms.lean) — the axiom audit over every declaration of the
   development.
