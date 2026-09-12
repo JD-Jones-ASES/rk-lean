@@ -67,7 +67,7 @@ elaboration and 14 s of kernel checking on the reference machine; `RK/Pools.lean
 about 85 s. The largest power comparison is `22^3494 < 1764220719766^383`, two numbers
 of 4691 decimal digits each.
 
-**Mutation controls run at this snapshot.** Five faults were injected one at a time in a scratch
+**Mutation controls run at this snapshot.** Six faults were injected one at a time in a scratch
 copy of the repository, built, and reverted; every one was caught:
 
 * a corrupted vertex in one block of `pool4` (`(3, 0)` to `(4, 0)` at `m = 5`) and a corrupted rank
@@ -85,7 +85,10 @@ copy of the repository, built, and reverted; every one was caught:
   `lake build Test` fails with seventeen unexpected `sorryAx` dependencies, four of them on the
   compared theorems;
 * `hsf : Squarefree m` dropped from `lemmaA`'s statement: `RK/LemmaA.lean` fails at the three
-  places that consume square-freeness (`step2_dvd`, `step3_pow_dvd`, `step4_leading_power`).
+  places that consume square-freeness (`step2_dvd`, `step3_pow_dvd`, `step4_leading_power`);
+* after the pools were updated, a corrupted rank in the block at `51` (`(35, 16)` to `(35, 0)`, in
+  `Challenge.lean`, `RK/Defs.lean` and `RK/Pools.lean` alike): `lake build RK.Pools` fails with
+  "`decide` proved that the proposition `ValidRankedSupport 4 51 … 17` is false".
 
 ## Source guard
 
