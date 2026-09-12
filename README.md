@@ -138,7 +138,7 @@ above applies to it: `51` is not a prime of either congruence class (`3 ≡ 3 (m
 `17 ≡ 1 (mod 8)`), and the relation modulo `51` is not antisymmetric, since `18` and `−18 = 33`
 are both fourth-power residues. The interval argument is doing the work, and `ValidPool` asks for
 nothing more — square-free moduli, pairwise coprime, and a ranking. Its seventeen vertices are the
-largest ranked support at `51`.
+largest ranked support at `51` (an exhaustive search outside the formal development).
 
 ## The two pools
 
