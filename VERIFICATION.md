@@ -44,7 +44,7 @@ At this snapshot the audit reported (reproduce with `lake build Test`; the line 
 `Test/Axioms.lean`):
 
 ```
-Audited 537 project constants; unexpected axiom dependencies: 0.
+Audited <<AUDIT_COUNT>> project constants; unexpected axiom dependencies: 0.
 ```
 
 **Non-default options.** The development sets, in total: `autoImplicit false` and
@@ -57,15 +57,15 @@ guard that the power comparisons there exceed — without it the kernel-backed `
 succeed but each logs a threshold warning. Every one of these raises an elaboration limit or
 silences a linter; none affects the kernel check.
 
-**Tactics on the finite and numeric parts.** The seventeen block verifications of `RK/Pools.lean`
-and the thirty-six power comparisons of `RK/Numeric.lean` use ordinary `decide`, which hands the
+**Tactics on the finite and numeric parts.** The eighteen block verifications of `RK/Pools.lean`
+and the thirty-eight power comparisons of `RK/Numeric.lean` use ordinary `decide`, which hands the
 proposition to the kernel's own arbitrary-precision arithmetic. There is no `decide +kernel` and
 no `native_decide` anywhere in the repository, and no custom `axiom`. The largest finite check is
 the 34-vertex support at modulus `139`, which is `33 · 34` ordered pairs each testing membership
 in the set of nonzero sixth-power residues by a search over `z < 139`; it takes about 17 s of
 elaboration and 14 s of kernel checking on the reference machine; `RK/Pools.lean` as a whole builds in
-about 85 s. The largest power comparison is `29^2931 < 1764220719766^350`, two numbers
-of 4287 decimal digits each.
+about 85 s. The largest power comparison is `22^3494 < 1764220719766^383`, two numbers
+of 4691 decimal digits each.
 
 **Mutation controls run at this snapshot.** Five faults were injected one at a time in a scratch
 copy of the repository, built, and reverted; every one was caught:
@@ -130,7 +130,8 @@ and reading nothing from the Lean sources:
   `0` present, every rank below the stated height, and a strict rank drop along every arc — with
   the set of nonzero k-th-power residues recomputed as the full image of `z ↦ z^k mod m` over
   `z < m` with `0` removed, exactly as in the formal definition;
-* every modulus is prime, hence square-free, and the moduli of a pool are pairwise coprime;
+* every modulus is square-free — the seventeen prime moduli by primality, and `51 = 3 · 17` by its
+  factorisation — and the moduli of a pool are pairwise coprime;
 * the two exponents to twelve decimal places, and the two Ruzsa transfer values they are compared
   against;
 * every rational bound carried by `RK/Numeric.lean`, each re-checked as the exact natural-power
@@ -139,13 +140,15 @@ and reading nothing from the Lean sources:
 * controls that must fail: a block with one rank raised to equal its predecessor's, and a block
   with one vertex moved. A checker that accepted these would be vacuous.
 
-At this snapshot it reports `218 checks, 0 failed` and exits `0`.
+At this snapshot it reports `<<CHECK_COUNT>> checks, 0 failed` and exits `0`.
 
 ## Not checked here
 
-* **Maximality of the supports.** That no larger ranked support exists at any of the seventeen
-  moduli is a search result, not a theorem, and is not verified in Lean or in the script. The
-  blocks are lower-bound witnesses only.
+* **Maximality of the supports.** That no larger ranked support exists at any of the eighteen
+  moduli is a search result, not a theorem, and is not verified in Lean or in the script — this
+  includes the moduli where the search was exhaustive and the size is therefore known to be exact
+  (`5, 13, 29, 37, 51, 53, 61` at `k = 4` and `7, 19, 31, 43` at `k = 6`), which `README.md`
+  reports as context. The blocks are lower-bound witnesses only.
 * **Minimality of the heights.** The stored `H` is the number of rank values the block uses and is
   verified as an upper bound on the ranks; that no smaller height admits the same support is not
   claimed or checked.

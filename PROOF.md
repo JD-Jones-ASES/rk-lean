@@ -60,7 +60,7 @@ large `N`. — `directed_pointwise`.
 
 — `directed_liminf`.
 
-**Theorem C (the two pools).** The eight blocks of `pool4` listed in `Challenge.lean` form a pool
+**Theorem C (the two pools).** The nine blocks of `pool4` listed in `Challenge.lean` form a pool
 for `k = 4`, and the nine blocks of `pool6` form a pool for `k = 6`. — `pool4_valid`,
 `pool6_valid`.
 
@@ -70,11 +70,11 @@ Theorem B applied to Theorem C.
 
 **Theorem E (where the exponents sit).**
 
-    (3 + log 6/log 17)/4 < alpha 4 pool4        and   0.9103 < alpha 4 pool4
-    (5 + log 6/log 13)/6 < alpha 6 pool6        and   0.9507 < alpha 6 pool6
+    (3 + log 6/log 17)/4 < alpha 4 pool4        and   0.9121 < alpha 4 pool4
+    (5 + log 6/log 13)/6 < alpha 6 pool6        and   0.9508 < alpha 6 pool6
 
 — `alpha4_gt_transfer`, `alpha4_gt`, `alpha6_gt_transfer`, `alpha6_gt`. The true values are
-`alpha 4 pool4 = 0.910358021185…` and `alpha 6 pool6 = 0.950738855746…`; the two transfer values
+`alpha 4 pool4 = 0.912145042700…` and `alpha 6 pool6 = 0.950825559086…`; the two transfer values
 are `0.908103119289…` and `0.949759249243…`.
 
 Context. The residue transfer `d_k ≥ (k − 1 + log_m r_k(m))/k` is Ruzsa's [R, Theorem 2], restated
@@ -95,10 +95,20 @@ exactly when `2k ∣ p − 1`. At **odd** `k`, `−1 = (−1)^k` is always a k-t
 `Q_k(m) = −Q_k(m)`, the relation is symmetric, and a block admitting a ranking can have no arcs at
 all: it is an independent residue set. Theorem A is still true, but with an independent set its
 exponent is `((k−1) log m + log t)/(k log m + log H)`, strictly below the transfer value
-`((k−1) log m + log t)/(k log m)`. At **even** `k` the usable primes are those with
-`k ∣ p − 1` and `2k ∤ p − 1` — `p ≡ 5 (mod 8)` for `k = 4`, `p ≡ 7 (mod 12)` for `k = 6` — and at
-those primes `Q_k(p) ∩ (−Q_k(p)) = ∅`, so a block can be both large and acyclic. Every modulus of
-`pool4` and `pool6` is such a prime.
+`((k−1) log m + log t)/(k log m)`. At **even** `k` the cleanest moduli are the primes with
+`k ∣ p − 1` and `2k ∤ p − 1` — `p ≡ 5 (mod 8)` for `k = 4`, `p ≡ 7 (mod 12)` for `k = 6` — where
+`Q_k(p) ∩ (−Q_k(p)) = ∅` outright, so every vertex set is acyclic and a block can be both large and
+acyclic. Every prime modulus of the two pools is of that kind.
+
+Antisymmetry on the block does not have to come from antisymmetry on all of `ℤ/m`, and one block of
+`pool4` shows it need not. If `t ≤ m − max Q_k(m)`, then any `t` consecutive residues form a block:
+along the interval order a forward difference lies in `{1, …, t−1}` and a backward one in
+`{m−t+1, …, m−1}`, and the latter all exceed `max Q_k(m)`, so every arc runs forward and the
+interval order is itself a ranking. `pool4`'s block at `m = 51 = 3 · 17` is this: `Q_4(51) =
+{1, 4, 13, 16, 18, 21, 30, 33, 34}` has maximum `34`, so the `17` residues `35, …, 50, 0` form a
+block of height `17`. Its modulus is square-free but not prime, and `Q_4(51)` is not antisymmetric
+(`18` and `33 = −18` both lie in it) — the interval argument is doing the work, and Theorem A needs
+nothing else, since `ValidPool` asks only for square-freeness, coprimality and the ranking.
 
 Inside the proofs, `k` does real work at exactly one place: Step 2 of Lemma A, where the valuation
 of a nonzero k-th-power residue is shown to be a multiple of `k`. Everywhere else it is threaded
@@ -358,12 +368,12 @@ logarithms *is* a comparison of two natural numbers: for `a, b ≥ 2` and `q ≥
 
 because `log b > 0` and `log` is strictly monotone (`lt_log_div_log`, `log_div_log_lt`). Each such
 comparison is discharged by `decide`, i.e. by the kernel's own arbitrary-precision arithmetic on
-`Nat.pow` and `Nat.decLt`; the largest pair here is `29^2931` (4287 digits) against
-`1764220719766^350`, and all thirty-six comparisons together cost a small part of the module's
+`Nat.pow` and `Nat.decLt`; the largest pair here is `22^3494` (4691 digits) against
+`1764220719766^383`, and all thirty-eight comparisons together cost a small part of the module's
 elaboration. Because `decide` is more kernel-bound than `norm_num`, not less, this strengthens the
 trust posture rather than relaxing it.
 
-Unfolding the pool folds once (`alpha4_eq`, `alpha6_eq`, using the seventeen identities
+Unfolding the pool folds once (`alpha4_eq`, `alpha6_eq`, using the eighteen identities
 `logNum4_*`, `logNum6_*` that merge `(k−1) log m + log t` into `log(m^{k−1} t)`) puts each exponent
 in the shape
 
@@ -383,6 +393,7 @@ approximation with denominator at most `400`.
 | 13 | 7 | 4 | 15379 | 1370/197 | 420/227 |
 | 29 | 12 | 11 | 292668 | 1454/277 | 521/371 |
 | 37 | 13 | 11 | 658489 | 2017/361 | 128/85 |
+| 51 | 17 | 17 | 2255067 | 253/49 | 501/361 |
 | 53 | 16 | 8 | 2382032 | 346/49 | 758/397 |
 | 61 | 16 | 10 | 3631696 | 2401/366 | 341/191 |
 | 101 | 20 | 12 | 20606020 | 1735/256 | 743/400 |
@@ -396,11 +407,11 @@ approximation with denominator at most `400`.
 | 19 | 10 | 3 | 24760990 | 4587/296 | 729/272 |
 | 31 | 15 | 9 | 429437265 | 3284/363 | 497/318 |
 | 43 | 18 | 6 | 2646151974 | 1889/156 | 254/121 |
-| 67 | 23 | 15 | 31052877461 | 2150/241 | 604/389 |
+| 67 | 23 | 14 | 31052877461 | 2609/285 | 615/386 |
 | 79 | 27 | 17 | 83080522773 | 1837/207 | 566/367 |
 | 103 | 30 | 13 | 347782222290 | 1637/158 | 468/259 |
-| 127 | 33 | 13 | 1090266190431 | 3123/289 | 17/9 |
-| 139 | 34 | 29 | 1764220719766 | 2931/350 | 551/376 |
+| 127 | 33 | 9 | 1090266190431 | 4453/353 | 657/298 |
+| 139 | 34 | 22 | 1764220719766 | 3494/383 | 265/166 |
 
 The two transfer values are handled the same way, from above: `log 6 / log 17 < 117/185`
 (`logHi_transfer4`), so `(3 + log 6/log 17)/4 < 168/185 = 0.908108108108…`, and
@@ -409,14 +420,15 @@ The two transfer values are handled the same way, from above: `log 6 / log 17 < 
 
 Assembling, the rational lower bounds proved are
 
-    alpha 4 pool4 > 0.910334755826…      (true value 0.910358021185…)
-    alpha 6 pool6 > 0.950714529770…      (true value 0.950738855746…)
+    alpha 4 pool4 > 0.912120556433…      (true value 0.912145042700…)
+    alpha 6 pool6 > 0.950819216434…      (true value 0.950825559086…)
 
-which clear the decimal targets `0.9103` and `0.9507` by `3.48 × 10⁻⁵` and `1.45 × 10⁻⁵`, and the
-two rational transfer ceilings by `2.23 × 10⁻³` and `9.54 × 10⁻⁴`. The roundings therefore cost
-about `2.3 × 10⁻⁵` and `2.4 × 10⁻⁵` of the available margin; tightening any bound means replacing
+which clear the decimal targets `0.9121` and `0.9508` by `2.06 × 10⁻⁵` and `1.92 × 10⁻⁵`, and the
+two rational transfer ceilings by `4.01 × 10⁻³` and `1.06 × 10⁻³`. The roundings therefore cost
+about `2.4 × 10⁻⁵` of the `4.5 × 10⁻⁵` available above `0.9121`, and `6.3 × 10⁻⁶` of the
+`2.6 × 10⁻⁵` available above `0.9508`; tightening any bound means replacing
 four numbers on one line, since each lemma is one translation plus one kernel comparison.
-`scripts/check_blocks.py` recomputes the exponents, re-checks every one of the thirty-six power
+`scripts/check_blocks.py` recomputes the exponents, re-checks every one of the thirty-eight power
 comparisons as an exact integer comparison, and redoes the rational assembly, independently of
 Lean.
 
@@ -424,13 +436,15 @@ Lean.
 
 `ValidPool k P` has four parts, each checked in the way that suits it (`RK/Pools.lean`):
 non-emptiness and pairwise coprimality of the moduli are computations on the stored numerals,
-settled by `decide`; `m ≥ 2` and `H ≥ 2` are `norm_num`; `Squarefree m` comes from primality
-(`norm_num` proves each modulus prime, and a prime is square-free — cheaper than the decidability
-instance for `Squarefree`, which factors); and `ValidRankedSupport k m sup H` is one pass over the
-ordered pairs of the support with `Q_k(m)` recomputed by a search over `z < m`, which is what
-`decide` performs in the kernel. This is done once per block, so each of the seventeen blocks
-stands as a statement of its own: `pool4_block5_valid … pool4_block109_valid`,
-`pool6_block7_valid … pool6_block139_valid`. The largest is the 34-vertex support at `139`.
+settled by `decide`; `m ≥ 2` and `H ≥ 2` are `norm_num`; `Squarefree m` is read off the
+factorisation — for the seventeen prime moduli from primality, which `norm_num` proves and which
+implies square-freeness, and for `51 = 3 · 17` from the two distinct prime factors; either route is
+cheaper than the decidability instance for `Squarefree`, which factors by search. Finally
+`ValidRankedSupport k m sup H` is one pass over the ordered pairs of the support with `Q_k(m)`
+recomputed by a search over `z < m`, which is what `decide` performs in the kernel. This is done
+once per block, so each of the eighteen blocks stands as a statement of its own:
+`pool4_block5_valid … pool4_block109_valid`, `pool6_block7_valid … pool6_block139_valid`. The
+largest is the 34-vertex support at `139`.
 
 The blocks are lower-bound witnesses. Nothing here claims that a support is largest possible or
 that a height is least possible.

@@ -2,7 +2,7 @@
 version: "v0.4"
 
 project:
-  name: "rk-lean: the directed construction for k-th-power-difference-free sets at every k, with the exponents 0.910358 (k = 4) and 0.950739 (k = 6)"
+  name: "rk-lean: the directed construction for k-th-power-difference-free sets at every k, with the exponents 0.912145 (k = 4) and 0.950826 (k = 6)"
   description: >-
     A Lean 4 proof of Krachun's directed (acyclic-block) lower-bound construction for sets of
     integers with no k-th-power difference, stated and proved for every exponent k >= 2. Let
@@ -15,12 +15,13 @@ project:
     alpha k P <= liminf log D_k(N)/log N, where
     alpha k P = (sum ((k-1) log m + log t)/log H) / (1 + k sum log m / log H) and t is the number
     of vertices of a block; and N^rho <= D_k(N) for all large N whenever rho < alpha k P. The
-    theorem is instantiated at k = 4 with eight blocks on the primes 5, 13, 29, 37, 53, 61, 101,
-    109 and at k = 6 with nine blocks on 7, 19, 31, 43, 67, 79, 103, 127, 139, giving the
-    exponents 0.910358021185... and 0.950738855746..., each proved to exceed the corresponding
+    theorem is instantiated at k = 4 with nine blocks, eight on the primes 5, 13, 29, 37, 53, 61,
+    101, 109 and one at the composite square-free modulus 51 = 3 * 17, and at k = 6 with nine
+    blocks on the primes 7, 19, 31, 43, 67, 79, 103, 127, 139, giving the
+    exponents 0.912145042700... and 0.950825559086..., each proved to exceed the corresponding
     Ruzsa transfer value ((3 + log 6/log 17)/4 = 0.908103119289... and
     (5 + log 6/log 13)/6 = 0.949759249243..., the latter being Ruzsa's own published Corollary at
-    k = 6) and the decimal bounds 0.9103 and 0.9507, by exact comparisons of natural powers.
+    k = 6) and the decimal bounds 0.9121 and 0.9508, by exact comparisons of natural powers.
   authors: ["JD Jones"]
   responsible_maintainers: ["JD Jones"]
   license: "MIT"
@@ -238,12 +239,14 @@ automation:
         in parallel, searched the literature and the formalization registries, wrote the
         documentation, and audited the outcome for statement fidelity, axioms and documentation
         accuracy. Lean 4.33.0 and Mathlib v4.33.0 (commit db584cd6) are pinned and lake update is
-        never run. The seventeen block verifications and the thirty-six rational bounds on ratios
+        never run. The eighteen block verifications and the thirty-eight rational bounds on ratios
         of logarithms are ordinary decide, i.e. kernel arithmetic on natural-number literals;
-        there is no decide +kernel and no native_decide in the repository. The blocks were found by
-        a CP-SAT and tabu search on one desktop machine on 2026-09-12; the solver is not in the
-        trust chain, since every block is re-verified in the Lean kernel by decide and again by a
-        standard-library Python checker that reads nothing from the Lean sources.
+        there is no decide +kernel and no native_decide in the repository. The blocks were found on
+        one desktop machine on 2026-09-12 by CP-SAT, tabu search and an exact branch-and-bound that
+        quotients by the multiplier symmetry of the k-th-power residues, except the block at
+        51 = 3 * 17, which is an interval of 17 consecutive residues and needs no search; no solver
+        is in the trust chain, since every block is re-verified in the Lean kernel by decide and
+        again by a standard-library Python checker that reads nothing from the Lean sources.
       prompting_notes: >-
         The human operator selected the problem, required the theorem to be stated for a general
         exponent k with no parity condition, required exact (non-numerical) proofs of the exponent
@@ -268,7 +271,11 @@ fidelity:
     decidable; D k N is a supremum of Finset.card over the k-th-power-difference-free subsets of
     Finset.Icc 1 N, and no range is stated as an interval in ℤ (instance diamonds are avoided by
     stating ranges as bounds). ValidPool admits a block with an empty support, which the proof
-    normalises away internally without changing the exponent. The general theorem at k >= 3 is new
+    normalises away internally without changing the exponent. ValidPool asks its moduli to be
+    square-free and pairwise coprime, not prime, and pool4 uses that latitude: its block at
+    51 = 3 * 17 is an interval of 17 consecutive residues, acyclic because every backward
+    difference along the interval exceeds the largest fourth-power residue mod 51, not because the
+    arc relation is antisymmetric (it is not at 51). The general theorem at k >= 3 is new
     to this development — Krachun states k = 2 — and the two pools, hence the two exponents at
     k = 4 and k = 6, are new data appearing in no source.
 
@@ -306,11 +313,13 @@ alignment:
         Same hypotheses, plus rho < alpha k P. Conclusion: (N : ℝ)^rho <= D k N for all
         sufficiently large N (eventually along atTop), which is the >>_P N^{alpha - eps} form of
         the source.
-    - source: "Not in any source: new instances. Eight blocks on the primes 5, 13, 29, 37, 53, 61, 101, 109, all congruent to 5 mod 8"
+    - source: "Not in any source: new instances. Nine blocks at k = 4 — eight on the primes 5, 13, 29, 37, 53, 61, 101, 109, all congruent to 5 mod 8, and one at the composite square-free modulus 51 = 3 * 17, an interval of 17 consecutive residues"
       lean: "KthPower.pool4_valid"
       module: "Solution"
       status: "proved"
-      note: "ValidPool 4 pool4, by decide on each of the eight blocks plus coprimality and primality of the moduli."
+      note: >-
+        ValidPool 4 pool4, by decide on each of the nine blocks plus coprimality of the moduli and
+        square-freeness (primality for the eight primes, the factorisation 3 * 17 for 51).
     - source: "Not in any source: new instances. Nine blocks on the primes 7, 19, 31, 43, 67, 79, 103, 127, 139, all congruent to 7 mod 12"
       lean: "KthPower.pool6_valid"
       module: "Solution"
@@ -321,8 +330,8 @@ alignment:
       module: "Solution"
       status: "proved"
       note: >-
-        (3 + log 6 / log 17) / 4 < alpha 4 pool4, i.e. 0.908103119289... < 0.910358021185...,
-        proved from eight rational lower bounds, eight rational upper bounds and the bound
+        (3 + log 6 / log 17) / 4 < alpha 4 pool4, i.e. 0.908103119289... < 0.912145042700...,
+        proved from nine rational lower bounds, nine rational upper bounds and the bound
         log 6 / log 17 < 117/185, each a comparison of natural powers discharged by decide. The
         only published k = 4 value is Ruzsa's own Corollary 0.872325271059..., which is lower; the
         0.908103... rung is unpublished and this repository's own computation.
@@ -330,20 +339,20 @@ alignment:
       lean: "KthPower.alpha4_gt"
       module: "Solution"
       status: "proved"
-      note: "0.9103 < alpha 4 pool4; the rational assembly proves 0.910334755826... < alpha 4 pool4."
+      note: "0.9121 < alpha 4 pool4; the rational assembly proves 0.912120556433... < alpha 4 pool4."
     - source: "Comparison with Ruzsa's own published Corollary at k = 6, p(12) = 13 (Ruzsa, doi:10.1007/BF02454169; the value 0.949759... is his, though he printed only the k = 3 and k = 5 instances)"
       lean: "KthPower.alpha6_gt_transfer"
       module: "Solution"
       status: "proved"
       note: >-
-        (5 + log 6 / log 13) / 6 < alpha 6 pool6, i.e. 0.949759249243... < 0.950738855746...,
+        (5 + log 6 / log 13) / 6 < alpha 6 pool6, i.e. 0.949759249243... < 0.950825559086...,
         proved from nine rational lower bounds, nine rational upper bounds and the bound
         log 6 / log 13 < 146/209, each a comparison of natural powers discharged by decide.
     - source: "Not in any source: decimal bound"
       lean: "KthPower.alpha6_gt"
       module: "Solution"
       status: "proved"
-      note: "0.9507 < alpha 6 pool6; the rational assembly proves 0.950714529770... < alpha 6 pool6."
+      note: "0.9508 < alpha 6 pool6; the rational assembly proves 0.950819216434... < alpha 6 pool6."
     - source: "Not in any source: the general theorem at the new k = 4 pool"
       lean: "KthPower.fourth_power_liminf"
       module: "Solution"

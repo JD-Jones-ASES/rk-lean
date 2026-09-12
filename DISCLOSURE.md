@@ -20,9 +20,13 @@ Anthropic's Claude models did the work, run through Claude Code:
   registries for the prior-art statement in `README.md`, wrote this documentation, and audited the
   result for statement fidelity, axioms and documentation accuracy.
 * Claude Opus subagents also found the blocks. The search ran on one desktop machine on
-  2026-09-12: for each candidate prime, a CP-SAT model for a maximum vertex set admitting a
-  ranking of a given height, with tabu search used to extend the reachable sizes. **The solver is
-  not in the trust chain.** Every block that survives into the repository is re-verified twice
+  2026-09-12 and used four methods: a CP-SAT model, per candidate modulus, for a maximum vertex
+  set admitting a ranking of a given height; tabu search to extend the sizes the model could not
+  close; an exact branch-and-bound that quotients the search by the multiplier symmetry of the
+  k-th-power residues, which is what settles the smaller moduli exhaustively; and, for the block
+  at `51 = 3 · 17`, the interval construction described in `README.md`, which needs no search at
+  all beyond computing `max Q_4(51)` and checking that no longer interval works. **No solver is
+  in the trust chain.** Every block that survives into the repository is re-verified twice
   independently of the search — in Lean by `decide`, in the kernel, from the definition of a
   nonzero k-th-power residue; and in `scripts/check_blocks.py` by a standard-library recomputation
   that reads nothing from the Lean sources and carries controls that must fail.
@@ -44,15 +48,18 @@ Beigel–Gasarch (arXiv:0804.4892). All are cited in `README.md`, `PROOF.md` and
 `formalization.yaml`.
 
 The contribution of this repository is: the formal statement and proof of the directed
-construction at every `k ≥ 2`; the two pools as new data; and the two exponent inequalities,
-proved by exact comparisons of natural powers rather than numerically.
+construction at every `k ≥ 2`; the two pools as new data, including the observation that an
+interval of `t ≤ m − max Q` consecutive residues is a block at any square-free modulus, prime or
+not, which is where `pool4`'s block at `51 = 3 · 17` comes from; and the two exponent
+inequalities, proved by exact comparisons of natural powers rather than numerically.
 
 ## Limits
 
 * The theorems are lower bounds. Nothing is claimed about upper bounds, and the known upper bounds
   for `D_k(N)` are all of the form `N^{1−o(1)}`, so the gap remains wide at every `k`.
 * Maximality of the supports, minimality of the heights and optimality of the pools are search
-  results at best, and are not theorems here — see the "Not checked here" section of
+  results at best, and are not theorems here — even at the moduli where the search was exhaustive
+  and the size is therefore known to be exact. See the "Not checked here" section of
   `VERIFICATION.md`.
 * The theta ceiling discussed in `README.md` is cited context and a numerical computation. It is
   explicitly outside the formal development: Mathlib has no Lovász theta function, and no theorem
