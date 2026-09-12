@@ -33,7 +33,7 @@ the sums over the blocks, with `t` the number of vertices of the block.
   `ρ < alpha k P`.
 * `pool4_valid`, `pool6_valid`: the two concrete lists below are pools for `k = 4` and `k = 6`.
 * `alpha4_gt_transfer`, `alpha4_gt`: `alpha 4 pool4` exceeds the transfer value
-  `(3 + log 6 / log 17) / 4 = 0.908104…` and `0.9103` (its value is `0.910358…`).
+  `(3 + log 6 / log 17) / 4 = 0.908103…` and `0.9103` (its value is `0.910358…`).
 * `alpha6_gt_transfer`, `alpha6_gt`: `alpha 6 pool6` exceeds the transfer value
   `(5 + log 6 / log 13) / 6 = 0.949759…` and `0.9507` (its value is `0.950739…`).
 * `fourth_power_liminf`, `sixth_power_liminf`: the two instances of `directed_liminf`.
@@ -177,7 +177,7 @@ theorem pool4_valid : ValidPool 4 pool4 := by
 theorem pool6_valid : ValidPool 6 pool6 := by
   sorry
 
-/-- The exponent at `k = 4` exceeds the transfer value `(3 + log 6 / log 17) / 4 = 0.908104…`
+/-- The exponent at `k = 4` exceeds the transfer value `(3 + log 6 / log 17) / 4 = 0.908103…`
 obtained from the six fourth-power-difference-free residues modulo `17`. -/
 theorem alpha4_gt_transfer : (3 + Real.log 6 / Real.log 17) / 4 < alpha 4 pool4 := by
   sorry
