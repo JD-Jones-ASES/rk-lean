@@ -49,7 +49,7 @@ Audited 537 project constants; unexpected axiom dependencies: 0.
 
 **Non-default options.** The development sets, in total: `autoImplicit false` and
 `relaxedAutoImplicit false` for every module (`lakefile.toml`); `linter.unusedVariables false` in
-eight modules, so that the standing hypotheses a step lemma carries for readability do not raise
+seven modules, so that the standing hypotheses a step lemma carries for readability do not raise
 warnings when its proof does not consume them; `maxRecDepth 10000` in `RK/Construction.lean` and
 `RK/Numeric.lean`, `maxRecDepth 100000` in `RK/Pools.lean`; and
 `exponentiation.threshold 100000` in `RK/Numeric.lean`, whose default of `256` is an evaluation
@@ -67,12 +67,25 @@ elaboration and 14 s of kernel checking on the reference machine; `RK/Pools.lean
 about 85 s. The largest power comparison is `29^2931 < 1764220719766^350`, two numbers
 of 4287 decimal digits each.
 
-**Mutation controls run at this snapshot:** `<<MUTATION_CONTROLS>>`. The faults injected are a
-corrupted vertex and a corrupted rank in one block of each pool (the corresponding `decide` must
-report the proposition false), a modulus replaced by a non-square-free number (leaving an
-unprovable goal), one rational bound loosened past the true ratio (the natural-power comparison
-must fail), and a `sorry` injected into a proved module of `RK/` (which compiles silently through
-`Solution.lean` and must be caught by the axiom audit and by the source guard).
+**Mutation controls run at this snapshot.** Five faults were injected one at a time in a scratch
+copy of the repository, built, and reverted; every one was caught:
+
+* a corrupted vertex in one block of `pool4` (`(3, 0)` to `(4, 0)` at `m = 5`) and a corrupted rank
+  in one block of `pool6` (`(5, 0)` to `(5, 5)` at `m = 7`): `lake build RK.Pools` fails with
+  "Tactic `decide` proved that the proposition … is false" for the corresponding block theorem (and,
+  when only `Challenge.lean` and `RK/Defs.lean` are corrupted, with a type mismatch at
+  `pool4_valid_internal`, since `RK/Pools.lean` carries its own copy of each support);
+* the modulus `5` replaced by the non-square-free `25` in that pool entry: `RK/Pools.lean` fails
+  with an unsolved goal `False` — `norm_num` cannot prove `Nat.Prime 25`;
+* one rational lower bound loosened past the true ratio (`1179/263` to `1180/263` for the block
+  at `5`): `lake build RK.Numeric` fails with "`decide` proved that the proposition
+  `4 ^ 1180 < 500 ^ 263` is false";
+* a `sorry` injected into a proved lemma of `RK/LemmaB.lean`: the library and `Solution.lean`
+  compile with one warning, `scripts/check-source.py` exits `1` naming the line, and
+  `lake build Test` fails with seventeen unexpected `sorryAx` dependencies, four of them on the
+  compared theorems;
+* `hsf : Squarefree m` dropped from `lemmaA`'s statement: `RK/LemmaA.lean` fails at the three
+  places that consume square-freeness (`step2_dvd`, `step3_pow_dvd`, `step4_leading_power`).
 
 ## Source guard
 

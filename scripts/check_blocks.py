@@ -116,7 +116,7 @@ BOUNDS = {
 }
 
 # The decimal target of `alpha{k}_gt`, the rational core bound of `alpha{k}_gt_rational`, and the
-# transfer value: r residues modulo `base`, so the exponent to beat is (k - 1 + log r/log base)/k,
+# transfer value: r residues modulo `base`, so the exponent to exceed is (k - 1 + log r/log base)/k,
 # bounded above using log r/log base < p/q (the `logHi_transfer` theorems).
 TARGETS = {
     4: {"decimal": Fraction(9103, 10000), "core": Fraction(91033, 100000),

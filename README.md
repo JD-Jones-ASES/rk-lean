@@ -138,8 +138,8 @@ exponent `(k − 1 + log_p t)/k`.
 | 5 | 4 | 4 | 0.861353 |
 | 13 | 7 | 4 | 0.758654 |
 | 29 | 12 | 11 | 0.737953 |
-| 37 | 13 | 11 | 0.710331 |
-| 53 | 16 | 8 | 0.698333 |
+| 37 | 13 | 11 | 0.710332 |
+| 53 | 16 | 8 | 0.698334 |
 | 61 | 16 | 10 | 0.674452 |
 | 101 | 20 | 12 | 0.649112 |
 | 109 | 21 | 8 | 0.648965 |
@@ -151,12 +151,12 @@ exponent `(k − 1 + log_p t)/k`.
 | 7 | 6 | 6 | 0.920782 |
 | 19 | 10 | 3 | 0.782011 |
 | 31 | 15 | 9 | 0.788602 |
-| 43 | 18 | 6 | 0.768470 |
+| 43 | 18 | 6 | 0.768471 |
 | 67 | 23 | 15 | 0.745713 |
 | 79 | 27 | 17 | 0.754291 |
 | 103 | 30 | 13 | 0.733850 |
 | 127 | 33 | 13 | 0.721794 |
-| 139 | 34 | 29 | 0.714637 |
+| 139 | 34 | 29 | 0.714638 |
 
 The vertex lists and the rank of each vertex are in [Challenge.lean](Challenge.lean).
 
@@ -202,9 +202,11 @@ Cayley graphs; `ϑ` bounds the independence number and is multiplicative under t
 so `log_m r_k(m) ≤ max_{p ∣ m} log_p ϑ` and the transfer exponent cannot exceed
 `(k − 1 + c_k)/k` with `c_k = max_p log_p ϑ(Cay(ℤ/p, ± k-th powers))`, `ϑ` the theta function of
 Lovász, *On the Shannon capacity of a graph*, IEEE Trans. Inform. Theory **25** (1979), no. 1,
-1–7, doi:10.1109/TIT.1979.1055985. A numerical evaluation of that maximum — a computation, not a
-theorem, and not checked in Lean — puts the ceiling at `0.924871` for `k = 4` and `0.956627` for
-`k = 6`. The exponents proved here, `0.910358…` and `0.950739…`, are still below
+1–7, doi:10.1109/TIT.1979.1055985. Each prime graph is edge-transitive, so its `ϑ` is the Lovász ratio bound `−n λ_min/(λ_max − λ_min)` in
+its eigenvalues (Gauss periods), and the Weil bound shows `log_p ϑ` decreases for large `p`; evaluating
+the maximum over primes — a computation, not a theorem, and not checked in Lean — puts it at
+`p = 41` for `k = 4` and `p = 157` for `k = 6`, and the ceiling at `0.924871` for `k = 4` and
+`0.956627` for `k = 6`. The exponents proved here, `0.910358…` and `0.950739…`, are still below
 those two numbers — but they are not bound by them, because the blocks of a pool are acyclic
 vertex sets, not independent ones, and the theta bound does not apply to them. That is the
 structural reason to expect the directed method to go further than any residue-set transfer can.

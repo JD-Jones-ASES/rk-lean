@@ -399,7 +399,7 @@ theorem logHi6_139 : Real.log 139 / Real.log 29 < (551 : ℝ) / 376 :=
 
 Ruzsa's transfer from a k-th-power-difference-free set of `r` residues modulo a square-free `m`
 gives the exponent `(k - 1 + log_m r) / k`. The two comparisons this file makes are against the
-six residues modulo `17` at `k = 4` and the six modulo `13` at `k = 6`, so the values to beat are
+six residues modulo `17` at `k = 4` and the six modulo `13` at `k = 6`, so the values to exceed are
 `(3 + log 6 / log 17) / 4` and `(5 + log 6 / log 13) / 6`, and an upper bound on each `log 6 /
 log H` is what the comparison needs. -/
 

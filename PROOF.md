@@ -12,14 +12,14 @@ sections.
 
 ## 1. Definitions and statements
 
-Throughout, `k ≥ 2` is a natural number and `[N] = {1, …, N}`.
+Throughout, `k ≥ 2` is a natural number.
 
 A finite set `A ⊆ ℕ` is **k-th-power-difference-free** if no element of `A` plus a positive k-th
 power lies again in `A`: for all `a ∈ A` and all `z ≥ 1`, `a + z^k ∉ A` (`PowerDifferenceFree`).
 Stated additively like this, both signs of a difference are covered at once, which is why nothing
 below needs an odd-`k` branch. Write
 
-    D_k(N) = max { |A| : A ⊆ [N], A k-th-power-difference-free }
+    D_k(N) = max { |A| : A ⊆ {1, …, N}, A k-th-power-difference-free }
 
 (`D`; in Lean a supremum of `Finset.card` over the k-th-power-difference-free members of the
 powerset of `Finset.Icc 1 N`).
@@ -207,7 +207,7 @@ The containment is `X < P^L` together with `wordRank < H^L` (`wordRank_lt_pow`),
 cardinality is `|wordBlock| = |C|^L` (`wordBlock_card`, by induction on `L`) transported through
 the injection `wordEmbed_injOn`.
 
-**Lemma B′ (the link to the counting function).** A k-th-power-difference-free subset of `[N]`
+**Lemma B′ (the link to the counting function).** A k-th-power-difference-free subset of `{1, …, N}`
 is a competitor in the supremum defining `D_k(N)`, so its size bounds `D_k(N)` below
 (`le_D_of_pdf`); combining, for `P = n^k` and a block `C` of height `H ≥ 1`,
 

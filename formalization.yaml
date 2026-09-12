@@ -122,7 +122,7 @@ sources:
     author_endorsement: "not-contacted"
     note: >-
       Acta Mathematica Hungarica 65 (1994), no. 2, 165-187. The upper-bound side at general fixed
-      k, extending Pintz-Steiger-Szemerédi; the best known general-degree bound is Rice's maximal
+      k, extending Pintz, Steiger and Szemerédi (J. London Math. Soc. (2) 37 (1988), 219-231); the best known general-degree bound is Rice's maximal
       extension (Acta Arith. 187 (2019), 1-41, doi:10.4064/aa170828-26-8). Not formalized here.
   - title: "New bounds for the Furstenberg–Sárközy theorem"
     authors: ["Ben Green", "Mehtaab Sawhney"]
@@ -144,8 +144,9 @@ sources:
     note: >-
       Registered 2026-08-26. The k = 2 case of the same construction: an eleven-block pool and
       the exponent 0.7537415..., proved to exceed Krachun's 0.752796455875.... This repository is
-      the general-k development on that architecture; the k = 2 pool of that entry is a valid
-      pool of the theorem proved here, and no k = 2 statement is re-derived.
+      the general-k development on that architecture; the eleven-block pool of that entry satisfies
+      the pool conditions of the theorem proved here at k = 2 (not re-verified in this repository),
+      and no k = 2 statement is re-derived.
   - title: "ry-lean: sets avoiding {x, x+y, x+y²} — Younis's two-set construction and the exponent 0.77028"
     authors: ["JD Jones"]
     id: "PALOMAR-2026-09-11-000003"
