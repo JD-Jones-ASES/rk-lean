@@ -16,7 +16,8 @@ What it checks, from the numbers alone:
     test is needed.  The set Q of nonzero k-th-power residues is recomputed here as the full
     image of z -> z^k mod m over all z < m, with 0 removed -- non-units included, exactly as in
     the formal definition.
-2.  Every modulus is prime (hence square-free) and the moduli of a pool are pairwise coprime.
+2.  Every modulus is square-free -- seventeen of the eighteen are prime, the exception being
+    51 = 3 * 17 -- and the moduli of a pool are pairwise coprime.
 3.  The exponent alpha of each pool, recomputed to twelve decimal places in exact-context decimal
     arithmetic, and the two Ruzsa transfer values it is compared against.
 4.  The rational bounds carried by RK/Numeric.lean: each is printed, each is re-checked as the
@@ -31,11 +32,17 @@ bounds are the same numbers as the `logLo`/`logHi` theorems of `RK/Numeric.lean`
 from the Lean sources: the point of this script is to be a second, independent opinion.
 """
 
+import sys
 from decimal import Decimal, getcontext
 from fractions import Fraction
 from math import gcd
 
 getcontext().prec = 60
+
+# One of the powers printed below has more than 4300 digits, which is CPython's default ceiling on
+# integer-to-string conversion.  Lift it where the interpreter offers the knob (3.9.14 and later).
+if hasattr(sys, "set_int_max_str_digits"):
+    sys.set_int_max_str_digits(0)
 
 # ---------------------------------------------------------------------------
 # The pools: the same numbers as `pool4` and `pool6` in `Challenge.lean`.
@@ -49,6 +56,8 @@ POOL4 = [
           (25, 4), (26, 1)], 11),
     (37, [(0, 9), (3, 10), (5, 1), (8, 10), (10, 6), (13, 7), (15, 0), (18, 9), (20, 3), (23, 4),
           (26, 5), (32, 2), (34, 8)], 11),
+    (51, [(0, 0), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 10), (42, 9),
+          (43, 8), (44, 7), (45, 6), (46, 5), (47, 4), (48, 3), (49, 2), (50, 1)], 17),
     (53, [(0, 0), (3, 0), (5, 5), (6, 1), (8, 2), (11, 6), (14, 6), (17, 7), (29, 1), (32, 1),
           (35, 2), (37, 3), (38, 2), (40, 7), (41, 4), (43, 7)], 8),
     (61, [(0, 1), (4, 6), (7, 7), (14, 4), (17, 5), (24, 2), (27, 3), (31, 7), (35, 9), (37, 1),
@@ -68,9 +77,9 @@ POOL6 = [
           (20, 5), (22, 4), (24, 3), (26, 2), (28, 1)], 9),
     (43, [(0, 2), (2, 5), (3, 4), (6, 4), (7, 1), (12, 2), (13, 1), (16, 1), (17, 0), (19, 3),
           (22, 3), (23, 0), (25, 5), (26, 1), (31, 1), (36, 3), (37, 0), (40, 2)], 6),
-    (67, [(0, 5), (2, 8), (4, 14), (5, 9), (6, 1), (10, 11), (11, 2), (14, 3), (16, 3), (18, 12),
-          (24, 4), (25, 1), (27, 7), (32, 10), (34, 0), (36, 0), (42, 6), (44, 13), (53, 12),
-          (55, 12), (63, 13), (64, 3), (65, 0)], 15),
+    (67, [(0, 9), (1, 5), (2, 3), (4, 6), (8, 12), (10, 4), (14, 1), (17, 2), (20, 3), (26, 0),
+          (30, 10), (33, 11), (37, 13), (39, 0), (43, 11), (46, 12), (47, 8), (49, 13), (55, 9),
+          (56, 7), (58, 10), (59, 8), (65, 4)], 14),
     (79, [(0, 9), (2, 12), (5, 1), (7, 4), (8, 1), (14, 16), (19, 13), (20, 11), (22, 8), (24, 5),
           (25, 2), (30, 0), (36, 14), (37, 12), (39, 15), (42, 3), (44, 7), (45, 1), (49, 13),
           (56, 16), (58, 10), (61, 14), (62, 2), (65, 6), (67, 0), (74, 3), (78, 15)], 17),
@@ -78,14 +87,14 @@ POOL6 = [
            (20, 0), (25, 1), (30, 1), (35, 9), (36, 0), (40, 8), (47, 2), (51, 5), (52, 4),
            (57, 10), (62, 10), (63, 1), (67, 11), (68, 0), (78, 6), (83, 5), (85, 2), (88, 11),
            (90, 6), (95, 5)], 13),
-    (127, [(0, 12), (2, 9), (6, 3), (9, 5), (19, 6), (21, 1), (24, 12), (26, 11), (28, 4), (32, 3),
-           (43, 10), (45, 1), (47, 0), (50, 11), (52, 8), (58, 10), (62, 9), (65, 10), (69, 4),
-           (71, 0), (81, 1), (84, 7), (86, 6), (88, 1), (91, 11), (93, 2), (98, 11), (99, 7),
-           (100, 0), (107, 0), (110, 10), (114, 7), (122, 2)], 13),
-    (139, [(0, 14), (6, 13), (7, 0), (18, 19), (24, 11), (25, 6), (27, 17), (31, 5), (33, 16),
-           (38, 25), (39, 15), (42, 0), (44, 2), (47, 23), (49, 28), (54, 18), (58, 7), (66, 20),
-           (67, 3), (74, 24), (79, 10), (85, 9), (91, 8), (93, 21), (96, 0), (104, 3), (110, 1),
-           (117, 17), (118, 12), (120, 26), (126, 22), (128, 27), (135, 1), (137, 4)], 29),
+    (127, [(0, 4), (1, 1), (4, 0), (7, 5), (13, 2), (16, 1), (22, 1), (27, 7), (28, 2), (31, 1),
+           (40, 6), (43, 6), (44, 1), (49, 5), (55, 6), (57, 0), (64, 3), (67, 8), (70, 7),
+           (71, 4), (79, 3), (84, 6), (85, 2), (86, 0), (92, 0), (97, 8), (99, 4), (101, 0),
+           (106, 7), (112, 6), (113, 1), (114, 0), (119, 5)], 9),
+    (139, [(0, 16), (1, 11), (5, 19), (11, 12), (20, 1), (25, 14), (30, 2), (31, 0), (40, 12),
+           (41, 5), (43, 2), (45, 7), (46, 6), (48, 17), (50, 16), (55, 8), (57, 4), (60, 17),
+           (62, 18), (69, 9), (71, 18), (73, 21), (78, 9), (90, 5), (91, 3), (97, 0), (113, 6),
+           (115, 14), (116, 13), (117, 10), (118, 4), (128, 16), (129, 15), (138, 20)], 22),
 ]
 
 POOLS = {4: POOL4, 6: POOL6}
@@ -100,6 +109,7 @@ BOUNDS = {
         13: ((1370, 197), (420, 227)),
         29: ((1454, 277), (521, 371)),
         37: ((2017, 361), (128, 85)),
+        51: ((253, 49), (501, 361)),
         53: ((346, 49), (758, 397)),
         61: ((2401, 366), (341, 191)),
         101: ((1735, 256), (743, 400)),
@@ -108,20 +118,20 @@ BOUNDS = {
         19: ((4587, 296), (729, 272)),
         31: ((3284, 363), (497, 318)),
         43: ((1889, 156), (254, 121)),
-        67: ((2150, 241), (604, 389)),
+        67: ((2609, 285), (615, 386)),
         79: ((1837, 207), (566, 367)),
         103: ((1637, 158), (468, 259)),
-        127: ((3123, 289), (17, 9)),
-        139: ((2931, 350), (551, 376))},
+        127: ((4453, 353), (657, 298)),
+        139: ((3494, 383), (265, 166))},
 }
 
 # The decimal target of `alpha{k}_gt`, the rational core bound of `alpha{k}_gt_rational`, and the
 # transfer value: r residues modulo `base`, so the exponent to exceed is (k - 1 + log r/log base)/k,
 # bounded above using log r/log base < p/q (the `logHi_transfer` theorems).
 TARGETS = {
-    4: {"decimal": Fraction(9103, 10000), "core": Fraction(91033, 100000),
+    4: {"decimal": Fraction(9121, 10000), "core": Fraction(91212, 100000),
         "r": 6, "base": 17, "transfer_hi": (117, 185)},
-    6: {"decimal": Fraction(9507, 10000), "core": Fraction(95071, 100000),
+    6: {"decimal": Fraction(9508, 10000), "core": Fraction(95081, 100000),
         "r": 6, "base": 13, "transfer_hi": (146, 209)},
 }
 
@@ -152,6 +162,32 @@ def is_prime(n):
             return False
         d += 1
     return True
+
+
+def is_squarefree(n):
+    """No prime square divides n.  Trial division: at these sizes nothing cleverer is wanted."""
+    if n < 1:
+        return False
+    d = 2
+    while d * d <= n:
+        if n % (d * d) == 0:
+            return False
+        d += 1
+    return True
+
+
+def factorisation(n):
+    """n as a product of primes with multiplicity, for the report line."""
+    out = []
+    d, r = 2, n
+    while d * d <= r:
+        while r % d == 0:
+            out.append(d)
+            r //= d
+        d += 1
+    if r > 1:
+        out.append(r)
+    return out
 
 
 def power_residues(k, m):
@@ -189,7 +225,7 @@ for k in (4, 6):
     for (m, sup, H) in POOLS[k]:
         ok, why = block_is_valid(k, m, sup, H)
         check(ok, "k = %d, m = %d: %s" % (k, m, why))
-        check(is_prime(m), "k = %d: modulus %d is prime (hence square-free)" % (k, m))
+        check(is_squarefree(m), "k = %d: modulus %d is square-free" % (k, m))
         check(H >= 2, "k = %d, m = %d: height at least 2" % (k, m))
         check(m >= 2, "k = %d, m = %d: modulus at least 2" % (k, m))
     moduli = [m for m, _, _ in POOLS[k]]
@@ -197,9 +233,14 @@ for k in (4, 6):
         for j in range(i + 1, len(moduli)):
             check(gcd(moduli[i], moduli[j]) == 1,
                   "k = %d: %d and %d coprime" % (k, moduli[i], moduli[j]))
-    check(len(POOLS[k]) == (8 if k == 4 else 9), "k = %d: block count" % k)
+    check(len(POOLS[k]) == 9, "k = %d: block count" % k)
     print("  k = %d: %d blocks, %d vertices in all, moduli %s"
           % (k, len(POOLS[k]), sum(len(s) for _, s, _ in POOLS[k]), moduli))
+    composite = [m for m in moduli if not is_prime(m)]
+    print("     all square-free; %d prime, composite: %s"
+          % (len(moduli) - len(composite),
+             ", ".join("%d = %s" % (m, " * ".join(str(f) for f in factorisation(m)))
+                       for m in composite) or "none"))
 
 # ---------------------------------------------------------------------------
 # 3.  The exponents and the transfer values, to twelve places
@@ -305,6 +346,11 @@ for k, (m, sup, H), label in ((4, bad_rank_4, "k = 4, rank of vertex 1 raised to
     ok, why = block_is_valid(k, m, sup, H)
     check(not ok, "control accepted a corrupted block (%s)" % label)
     print("  rejected (%s): %s" % (label, why))
+
+# A corrupted modulus: 153 = 3^2 * 17 is 51 with one factor repeated.  Since one modulus of the
+# pools really is composite, the square-freeness test does work here and is worth a control.
+check(not is_squarefree(153), "control accepted 153 = 3^2 * 17 as square-free")
+print("  rejected (153 = 3^2 * 17 in place of 51): not square-free")
 
 print()
 print("%d checks, %d failed" % (TOTAL, FAILED))

@@ -4,8 +4,8 @@ import RK.Pools
 # The two exponents, bounded below without transcendental arithmetic
 
 `alpha k P` is a ratio of sums of ratios of logarithms. This file proves the four numeric claims
-about its two concrete values — that `alpha 4 pool4` exceeds `0.9103` and the transfer value
-`(3 + log 6 / log 17) / 4`, and that `alpha 6 pool6` exceeds `0.9507` and the transfer value
+about its two concrete values — that `alpha 4 pool4` exceeds `0.9121` and the transfer value
+`(3 + log 6 / log 17) / 4`, and that `alpha 6 pool6` exceeds `0.9508` and the transfer value
 `(5 + log 6 / log 13) / 6` — with no floating-point or interval arithmetic anywhere.
 
 The one idea is that every fact about a logarithm needed here has the form
@@ -16,7 +16,7 @@ and that — `log b` being positive — each is equivalent to a comparison of tw
 `b ^ p < a ^ q` in the first case, `a ^ q < b ^ p` in the second. The Lean kernel settles such a
 comparison directly, on numbers of a few thousand digits, in milliseconds; `lt_log_div_log` and
 `log_div_log_lt` are the two translations, and the rest of the file is those two applied
-thirty-six times and the resulting rationals added up in exact arithmetic.
+thirty-eight times and the resulting rationals added up in exact arithmetic.
 
 ## The shape of the bound
 
@@ -26,7 +26,7 @@ For a pool `P` with blocks `(m, sup, H)` and `t = sup.length`,
 
 so a lower bound for `alpha` needs a lower bound `ρ` for each numerator ratio and an upper bound
 `σ` for each `log m / log H`. `alpha4_eq` and `alpha6_eq` put `alpha` in exactly that form, using
-`(k - 1) log m + log t = log (m ^ (k-1) t)` block by block; the seventeen `logNum…` lemmas are
+`(k - 1) log m + log t = log (m ^ (k-1) t)` block by block; the eighteen `logNum…` lemmas are
 those identities. Then `alpha ≥ (Σ ρ) / (1 + k Σ σ)`, a rational number, and the two core
 theorems `alpha4_gt_rational` and `alpha6_gt_rational` state what that rational clears.
 
@@ -38,12 +38,12 @@ high-precision arithmetic, and as an exact integer comparison `b ^ p < a ^ q` �
 `scripts/check_blocks.py` reruns both checks, and the rational assembly, from the pools alone.
 The assembled bounds are
 
-`alpha 4 pool4 > 0.910334755826…`  against a true value of `0.910358021…`, and
-`alpha 6 pool6 > 0.950714529769…`  against a true value of `0.950738856…`,
+`alpha 4 pool4 > 0.912120556433…`  against a true value of `0.912145043…`, and
+`alpha 6 pool6 > 0.950819216434…`  against a true value of `0.950825559…`,
 
-so the roundings cost `2.3 × 10⁻⁵` of the `5.8 × 10⁻⁵` available above `0.9103` and `2.4 × 10⁻⁵`
-of the `3.9 × 10⁻⁵` available above `0.9507`; the decimal targets clear with margins
-`3.5 × 10⁻⁵` and `1.5 × 10⁻⁵`, and the transfer values, which sit `2.3 × 10⁻³` and `1.0 × 10⁻³`
+so the roundings cost `2.4 × 10⁻⁵` of the `4.5 × 10⁻⁵` available above `0.9121` and
+`6.3 × 10⁻⁶` of the `2.6 × 10⁻⁵` available above `0.9508`; the decimal targets clear with margins
+`2.1 × 10⁻⁵` and `1.9 × 10⁻⁵`, and the transfer values, which sit `4.0 × 10⁻³` and `1.1 × 10⁻³`
 below the exponents, clear far more comfortably. Every numeral in the `ρ` and `σ` sections is
 substitutable: tightening a bound means replacing four numbers on one line, since each lemma is
 one application of a translation lemma plus one kernel comparison.
@@ -52,11 +52,11 @@ one application of a translation lemma plus one kernel comparison.
 
 A comparison of two natural-number literals *is* a kernel computation, and `decide` is what hands
 it to the kernel's arbitrary-precision arithmetic directly: `Nat.pow` and `Nat.decLt` on the
-numerals, nothing else. The largest pair here — `29 ^ 2931`, of `4287` digits, against
-`1764220719766 ^ 350` — costs milliseconds that way, and all thirty-six comparisons together are
-a small part of this file's elaboration. Since `decide` is more kernel-bound than `norm_num`, not
-less, this strengthens the trust posture rather than relaxing it; `norm_num` and `linarith` are
-left the purely rational assembly at the end, where the numbers are small.
+numerals, nothing else. The largest pair here — `22 ^ 3494`, of `4691` digits, against
+`1764220719766 ^ 383` — costs milliseconds that way, and all thirty-eight comparisons together
+are a small part of this file's elaboration. Since `decide` is more kernel-bound than `norm_num`,
+not less, this strengthens the trust posture rather than relaxing it; `norm_num` and `linarith`
+are left the purely rational assembly at the end, where the numbers are small.
 -/
 
 namespace KthPower
@@ -102,7 +102,7 @@ theorem log_div_log_lt (a b : ℝ) (p q : ℕ) (ha : 2 ≤ a) (hb : 2 ≤ b) (hq
 
 /-! ## The block numerators
 
-`(k - 1) log m + log t = log (m ^ (k-1) t)`: seventeen instances, one per block, so that each
+`(k - 1) log m + log t = log (m ^ (k-1) t)`: eighteen instances, one per block, so that each
 numerator ratio is a single `log a / log b` and the translation lemmas apply to it. -/
 
 /-- The numerator of the block at `m = 5`, `k = 4`: `5 ^ 3 · 4 = 500`. -/
@@ -126,6 +126,12 @@ theorem logNum4_29 : Real.log 292668 = 3 * Real.log 29 + Real.log 12 := by
 /-- The numerator of the block at `m = 37`, `k = 4`: `37 ^ 3 · 13 = 658489`. -/
 theorem logNum4_37 : Real.log 658489 = 3 * Real.log 37 + Real.log 13 := by
   rw [show (658489 : ℝ) = 37 ^ (3 : ℕ) * 13 by norm_num,
+    Real.log_mul (by positivity) (by norm_num), Real.log_pow]
+  norm_num
+
+/-- The numerator of the block at `m = 51`, `k = 4`: `51 ^ 3 · 17 = 2255067`. -/
+theorem logNum4_51 : Real.log 2255067 = 3 * Real.log 51 + Real.log 17 := by
+  rw [show (2255067 : ℝ) = 51 ^ (3 : ℕ) * 17 by norm_num,
     Real.log_mul (by positivity) (by norm_num), Real.log_pow]
   norm_num
 
@@ -216,14 +222,15 @@ single logarithm. -/
 theorem alpha4_eq :
     alpha 4 pool4 =
       (Real.log 500 / Real.log 4 + Real.log 15379 / Real.log 4 + Real.log 292668 / Real.log 11 +
-        Real.log 658489 / Real.log 11 + Real.log 2382032 / Real.log 8 +
-        Real.log 3631696 / Real.log 10 + Real.log 20606020 / Real.log 12 +
-        Real.log 27195609 / Real.log 8) /
+        Real.log 658489 / Real.log 11 + Real.log 2255067 / Real.log 17 +
+        Real.log 2382032 / Real.log 8 + Real.log 3631696 / Real.log 10 +
+        Real.log 20606020 / Real.log 12 + Real.log 27195609 / Real.log 8) /
       (1 + 4 * (Real.log 5 / Real.log 4 + Real.log 13 / Real.log 4 + Real.log 29 / Real.log 11 +
-        Real.log 37 / Real.log 11 + Real.log 53 / Real.log 8 + Real.log 61 / Real.log 10 +
-        Real.log 101 / Real.log 12 + Real.log 109 / Real.log 8)) := by
-  rw [logNum4_5, logNum4_13, logNum4_29, logNum4_37, logNum4_53, logNum4_61, logNum4_101,
-    logNum4_109]
+        Real.log 37 / Real.log 11 + Real.log 51 / Real.log 17 + Real.log 53 / Real.log 8 +
+        Real.log 61 / Real.log 10 + Real.log 101 / Real.log 12 +
+        Real.log 109 / Real.log 8)) := by
+  rw [logNum4_5, logNum4_13, logNum4_29, logNum4_37, logNum4_51, logNum4_53, logNum4_61,
+    logNum4_101, logNum4_109]
   norm_num [alpha, pool4]
   ring
 
@@ -233,19 +240,19 @@ theorem alpha6_eq :
     alpha 6 pool6 =
       (Real.log 100842 / Real.log 6 + Real.log 24760990 / Real.log 3 +
         Real.log 429437265 / Real.log 9 + Real.log 2646151974 / Real.log 6 +
-        Real.log 31052877461 / Real.log 15 + Real.log 83080522773 / Real.log 17 +
-        Real.log 347782222290 / Real.log 13 + Real.log 1090266190431 / Real.log 13 +
-        Real.log 1764220719766 / Real.log 29) /
+        Real.log 31052877461 / Real.log 14 + Real.log 83080522773 / Real.log 17 +
+        Real.log 347782222290 / Real.log 13 + Real.log 1090266190431 / Real.log 9 +
+        Real.log 1764220719766 / Real.log 22) /
       (1 + 6 * (Real.log 7 / Real.log 6 + Real.log 19 / Real.log 3 + Real.log 31 / Real.log 9 +
-        Real.log 43 / Real.log 6 + Real.log 67 / Real.log 15 + Real.log 79 / Real.log 17 +
-        Real.log 103 / Real.log 13 + Real.log 127 / Real.log 13 +
-        Real.log 139 / Real.log 29)) := by
+        Real.log 43 / Real.log 6 + Real.log 67 / Real.log 14 + Real.log 79 / Real.log 17 +
+        Real.log 103 / Real.log 13 + Real.log 127 / Real.log 9 +
+        Real.log 139 / Real.log 22)) := by
   rw [logNum6_7, logNum6_19, logNum6_31, logNum6_43, logNum6_67, logNum6_79, logNum6_103,
     logNum6_127, logNum6_139]
   norm_num [alpha, pool6]
   ring
 
-/-! ## The eight lower bounds `ρ` at `k = 4`
+/-! ## The nine lower bounds `ρ` at `k = 4`
 
 **Substitutable numerals.** Each line is `lt_log_div_log (m ^ 3 t) H p q … (H ^ p < (m ^ 3 t) ^ q)`;
 replacing `p` and `q` in the statement and in the `decide`d comparison is the whole of a
@@ -267,6 +274,10 @@ theorem logLo4_37 : (2017 : ℝ) / 361 < Real.log 658489 / Real.log 11 :=
   lt_log_div_log 658489 11 2017 361 (by norm_num) (by norm_num) (by norm_num)
     (by exact_mod_cast (by decide : (11 : ℕ) ^ 2017 < 658489 ^ 361))
 
+theorem logLo4_51 : (253 : ℝ) / 49 < Real.log 2255067 / Real.log 17 :=
+  lt_log_div_log 2255067 17 253 49 (by norm_num) (by norm_num) (by norm_num)
+    (by exact_mod_cast (by decide : (17 : ℕ) ^ 253 < 2255067 ^ 49))
+
 theorem logLo4_53 : (346 : ℝ) / 49 < Real.log 2382032 / Real.log 8 :=
   lt_log_div_log 2382032 8 346 49 (by norm_num) (by norm_num) (by norm_num)
     (by exact_mod_cast (by decide : (8 : ℕ) ^ 346 < 2382032 ^ 49))
@@ -283,7 +294,7 @@ theorem logLo4_109 : (2091 : ℝ) / 254 < Real.log 27195609 / Real.log 8 :=
   lt_log_div_log 27195609 8 2091 254 (by norm_num) (by norm_num) (by norm_num)
     (by exact_mod_cast (by decide : (8 : ℕ) ^ 2091 < 27195609 ^ 254))
 
-/-! ## The eight upper bounds `σ` at `k = 4`
+/-! ## The nine upper bounds `σ` at `k = 4`
 
 **Substitutable numerals**, on the same terms as the section above. -/
 
@@ -302,6 +313,10 @@ theorem logHi4_29 : Real.log 29 / Real.log 11 < (521 : ℝ) / 371 :=
 theorem logHi4_37 : Real.log 37 / Real.log 11 < (128 : ℝ) / 85 :=
   log_div_log_lt 37 11 128 85 (by norm_num) (by norm_num) (by norm_num)
     (by exact_mod_cast (by decide : (37 : ℕ) ^ 85 < 11 ^ 128))
+
+theorem logHi4_51 : Real.log 51 / Real.log 17 < (501 : ℝ) / 361 :=
+  log_div_log_lt 51 17 501 361 (by norm_num) (by norm_num) (by norm_num)
+    (by exact_mod_cast (by decide : (51 : ℕ) ^ 361 < 17 ^ 501))
 
 theorem logHi4_53 : Real.log 53 / Real.log 8 < (758 : ℝ) / 397 :=
   log_div_log_lt 53 8 758 397 (by norm_num) (by norm_num) (by norm_num)
@@ -337,9 +352,9 @@ theorem logLo6_43 : (1889 : ℝ) / 156 < Real.log 2646151974 / Real.log 6 :=
   lt_log_div_log 2646151974 6 1889 156 (by norm_num) (by norm_num) (by norm_num)
     (by exact_mod_cast (by decide : (6 : ℕ) ^ 1889 < 2646151974 ^ 156))
 
-theorem logLo6_67 : (2150 : ℝ) / 241 < Real.log 31052877461 / Real.log 15 :=
-  lt_log_div_log 31052877461 15 2150 241 (by norm_num) (by norm_num) (by norm_num)
-    (by exact_mod_cast (by decide : (15 : ℕ) ^ 2150 < 31052877461 ^ 241))
+theorem logLo6_67 : (2609 : ℝ) / 285 < Real.log 31052877461 / Real.log 14 :=
+  lt_log_div_log 31052877461 14 2609 285 (by norm_num) (by norm_num) (by norm_num)
+    (by exact_mod_cast (by decide : (14 : ℕ) ^ 2609 < 31052877461 ^ 285))
 
 theorem logLo6_79 : (1837 : ℝ) / 207 < Real.log 83080522773 / Real.log 17 :=
   lt_log_div_log 83080522773 17 1837 207 (by norm_num) (by norm_num) (by norm_num)
@@ -349,13 +364,13 @@ theorem logLo6_103 : (1637 : ℝ) / 158 < Real.log 347782222290 / Real.log 13 :=
   lt_log_div_log 347782222290 13 1637 158 (by norm_num) (by norm_num) (by norm_num)
     (by exact_mod_cast (by decide : (13 : ℕ) ^ 1637 < 347782222290 ^ 158))
 
-theorem logLo6_127 : (3123 : ℝ) / 289 < Real.log 1090266190431 / Real.log 13 :=
-  lt_log_div_log 1090266190431 13 3123 289 (by norm_num) (by norm_num) (by norm_num)
-    (by exact_mod_cast (by decide : (13 : ℕ) ^ 3123 < 1090266190431 ^ 289))
+theorem logLo6_127 : (4453 : ℝ) / 353 < Real.log 1090266190431 / Real.log 9 :=
+  lt_log_div_log 1090266190431 9 4453 353 (by norm_num) (by norm_num) (by norm_num)
+    (by exact_mod_cast (by decide : (9 : ℕ) ^ 4453 < 1090266190431 ^ 353))
 
-theorem logLo6_139 : (2931 : ℝ) / 350 < Real.log 1764220719766 / Real.log 29 :=
-  lt_log_div_log 1764220719766 29 2931 350 (by norm_num) (by norm_num) (by norm_num)
-    (by exact_mod_cast (by decide : (29 : ℕ) ^ 2931 < 1764220719766 ^ 350))
+theorem logLo6_139 : (3494 : ℝ) / 383 < Real.log 1764220719766 / Real.log 22 :=
+  lt_log_div_log 1764220719766 22 3494 383 (by norm_num) (by norm_num) (by norm_num)
+    (by exact_mod_cast (by decide : (22 : ℕ) ^ 3494 < 1764220719766 ^ 383))
 
 /-! ## The nine upper bounds `σ` at `k = 6` -/
 
@@ -375,9 +390,9 @@ theorem logHi6_43 : Real.log 43 / Real.log 6 < (254 : ℝ) / 121 :=
   log_div_log_lt 43 6 254 121 (by norm_num) (by norm_num) (by norm_num)
     (by exact_mod_cast (by decide : (43 : ℕ) ^ 121 < 6 ^ 254))
 
-theorem logHi6_67 : Real.log 67 / Real.log 15 < (604 : ℝ) / 389 :=
-  log_div_log_lt 67 15 604 389 (by norm_num) (by norm_num) (by norm_num)
-    (by exact_mod_cast (by decide : (67 : ℕ) ^ 389 < 15 ^ 604))
+theorem logHi6_67 : Real.log 67 / Real.log 14 < (615 : ℝ) / 386 :=
+  log_div_log_lt 67 14 615 386 (by norm_num) (by norm_num) (by norm_num)
+    (by exact_mod_cast (by decide : (67 : ℕ) ^ 386 < 14 ^ 615))
 
 theorem logHi6_79 : Real.log 79 / Real.log 17 < (566 : ℝ) / 367 :=
   log_div_log_lt 79 17 566 367 (by norm_num) (by norm_num) (by norm_num)
@@ -387,13 +402,13 @@ theorem logHi6_103 : Real.log 103 / Real.log 13 < (468 : ℝ) / 259 :=
   log_div_log_lt 103 13 468 259 (by norm_num) (by norm_num) (by norm_num)
     (by exact_mod_cast (by decide : (103 : ℕ) ^ 259 < 13 ^ 468))
 
-theorem logHi6_127 : Real.log 127 / Real.log 13 < (17 : ℝ) / 9 :=
-  log_div_log_lt 127 13 17 9 (by norm_num) (by norm_num) (by norm_num)
-    (by exact_mod_cast (by decide : (127 : ℕ) ^ 9 < 13 ^ 17))
+theorem logHi6_127 : Real.log 127 / Real.log 9 < (657 : ℝ) / 298 :=
+  log_div_log_lt 127 9 657 298 (by norm_num) (by norm_num) (by norm_num)
+    (by exact_mod_cast (by decide : (127 : ℕ) ^ 298 < 9 ^ 657))
 
-theorem logHi6_139 : Real.log 139 / Real.log 29 < (551 : ℝ) / 376 :=
-  log_div_log_lt 139 29 551 376 (by norm_num) (by norm_num) (by norm_num)
-    (by exact_mod_cast (by decide : (139 : ℕ) ^ 376 < 29 ^ 551))
+theorem logHi6_139 : Real.log 139 / Real.log 22 < (265 : ℝ) / 166 :=
+  log_div_log_lt 139 22 265 166 (by norm_num) (by norm_num) (by norm_num)
+    (by exact_mod_cast (by decide : (139 : ℕ) ^ 166 < 22 ^ 265))
 
 /-! ## The two transfer values
 
@@ -417,67 +432,70 @@ theorem logHi_transfer6 : Real.log 6 / Real.log 13 < (146 : ℝ) / 209 :=
 
 `(Σ ρ) / (1 + k Σ σ)` is a rational number below the exponent, and the passage from the bounds to
 that inequality needs only that the denominator is positive, which every `log H > 0` supplies.
-The exact assembled values are `0.910334755826…` and `0.950714529769…`; the two theorems below
-state a decimal just underneath each of them, `0.91033` and `0.95071`, and the four target
+The exact assembled values are `0.912120556433…` and `0.950819216434…`; the two theorems below
+state a decimal just underneath each of them, `0.91212` and `0.95081`, and the four target
 statements follow from those two by rational arithmetic alone. -/
 
-/-- **The exponent at `k = 4` exceeds `0.91033`**, from the sixteen rational bounds on its
+/-- **The exponent at `k = 4` exceeds `0.91212`**, from the eighteen rational bounds on its
 blocks. This is the one inequality from which both `k = 4` targets follow. -/
-theorem alpha4_gt_rational : (0.91033 : ℝ) < alpha 4 pool4 := by
+theorem alpha4_gt_rational : (0.91212 : ℝ) < alpha 4 pool4 := by
   have l4 : (0 : ℝ) < Real.log 4 := Real.log_pos (by norm_num)
   have l8 : (0 : ℝ) < Real.log 8 := Real.log_pos (by norm_num)
   have l10 : (0 : ℝ) < Real.log 10 := Real.log_pos (by norm_num)
   have l11 : (0 : ℝ) < Real.log 11 := Real.log_pos (by norm_num)
   have l12 : (0 : ℝ) < Real.log 12 := Real.log_pos (by norm_num)
+  have l17 : (0 : ℝ) < Real.log 17 := Real.log_pos (by norm_num)
   have d1 : (0 : ℝ) < Real.log 5 / Real.log 4 := div_pos (Real.log_pos (by norm_num)) l4
   have d2 : (0 : ℝ) < Real.log 13 / Real.log 4 := div_pos (Real.log_pos (by norm_num)) l4
   have d3 : (0 : ℝ) < Real.log 29 / Real.log 11 := div_pos (Real.log_pos (by norm_num)) l11
   have d4 : (0 : ℝ) < Real.log 37 / Real.log 11 := div_pos (Real.log_pos (by norm_num)) l11
-  have d5 : (0 : ℝ) < Real.log 53 / Real.log 8 := div_pos (Real.log_pos (by norm_num)) l8
-  have d6 : (0 : ℝ) < Real.log 61 / Real.log 10 := div_pos (Real.log_pos (by norm_num)) l10
-  have d7 : (0 : ℝ) < Real.log 101 / Real.log 12 := div_pos (Real.log_pos (by norm_num)) l12
-  have d8 : (0 : ℝ) < Real.log 109 / Real.log 8 := div_pos (Real.log_pos (by norm_num)) l8
+  have d5 : (0 : ℝ) < Real.log 51 / Real.log 17 := div_pos (Real.log_pos (by norm_num)) l17
+  have d6 : (0 : ℝ) < Real.log 53 / Real.log 8 := div_pos (Real.log_pos (by norm_num)) l8
+  have d7 : (0 : ℝ) < Real.log 61 / Real.log 10 := div_pos (Real.log_pos (by norm_num)) l10
+  have d8 : (0 : ℝ) < Real.log 101 / Real.log 12 := div_pos (Real.log_pos (by norm_num)) l12
+  have d9 : (0 : ℝ) < Real.log 109 / Real.log 8 := div_pos (Real.log_pos (by norm_num)) l8
   have hden : (0 : ℝ) <
       1 + 4 * (Real.log 5 / Real.log 4 + Real.log 13 / Real.log 4 + Real.log 29 / Real.log 11 +
-        Real.log 37 / Real.log 11 + Real.log 53 / Real.log 8 + Real.log 61 / Real.log 10 +
-        Real.log 101 / Real.log 12 + Real.log 109 / Real.log 8) := by linarith
+        Real.log 37 / Real.log 11 + Real.log 51 / Real.log 17 + Real.log 53 / Real.log 8 +
+        Real.log 61 / Real.log 10 + Real.log 101 / Real.log 12 +
+        Real.log 109 / Real.log 8) := by linarith
   rw [alpha4_eq, lt_div_iff₀ hden]
-  linarith [logLo4_5, logLo4_13, logLo4_29, logLo4_37, logLo4_53, logLo4_61, logLo4_101,
-    logLo4_109, logHi4_5, logHi4_13, logHi4_29, logHi4_37, logHi4_53, logHi4_61, logHi4_101,
-    logHi4_109]
+  linarith [logLo4_5, logLo4_13, logLo4_29, logLo4_37, logLo4_51, logLo4_53, logLo4_61,
+    logLo4_101, logLo4_109, logHi4_5, logHi4_13, logHi4_29, logHi4_37, logHi4_51, logHi4_53,
+    logHi4_61, logHi4_101, logHi4_109]
 
-/-- **The exponent at `k = 6` exceeds `0.95071`**, from the eighteen rational bounds on its
+/-- **The exponent at `k = 6` exceeds `0.95081`**, from the eighteen rational bounds on its
 blocks. This is the one inequality from which both `k = 6` targets follow. -/
-theorem alpha6_gt_rational : (0.95071 : ℝ) < alpha 6 pool6 := by
+theorem alpha6_gt_rational : (0.95081 : ℝ) < alpha 6 pool6 := by
   have l3 : (0 : ℝ) < Real.log 3 := Real.log_pos (by norm_num)
   have l6 : (0 : ℝ) < Real.log 6 := Real.log_pos (by norm_num)
   have l9 : (0 : ℝ) < Real.log 9 := Real.log_pos (by norm_num)
   have l13 : (0 : ℝ) < Real.log 13 := Real.log_pos (by norm_num)
-  have l15 : (0 : ℝ) < Real.log 15 := Real.log_pos (by norm_num)
+  have l14 : (0 : ℝ) < Real.log 14 := Real.log_pos (by norm_num)
   have l17 : (0 : ℝ) < Real.log 17 := Real.log_pos (by norm_num)
-  have l29 : (0 : ℝ) < Real.log 29 := Real.log_pos (by norm_num)
+  have l22 : (0 : ℝ) < Real.log 22 := Real.log_pos (by norm_num)
   have d1 : (0 : ℝ) < Real.log 7 / Real.log 6 := div_pos (Real.log_pos (by norm_num)) l6
   have d2 : (0 : ℝ) < Real.log 19 / Real.log 3 := div_pos (Real.log_pos (by norm_num)) l3
   have d3 : (0 : ℝ) < Real.log 31 / Real.log 9 := div_pos (Real.log_pos (by norm_num)) l9
   have d4 : (0 : ℝ) < Real.log 43 / Real.log 6 := div_pos (Real.log_pos (by norm_num)) l6
-  have d5 : (0 : ℝ) < Real.log 67 / Real.log 15 := div_pos (Real.log_pos (by norm_num)) l15
+  have d5 : (0 : ℝ) < Real.log 67 / Real.log 14 := div_pos (Real.log_pos (by norm_num)) l14
   have d6 : (0 : ℝ) < Real.log 79 / Real.log 17 := div_pos (Real.log_pos (by norm_num)) l17
   have d7 : (0 : ℝ) < Real.log 103 / Real.log 13 := div_pos (Real.log_pos (by norm_num)) l13
-  have d8 : (0 : ℝ) < Real.log 127 / Real.log 13 := div_pos (Real.log_pos (by norm_num)) l13
-  have d9 : (0 : ℝ) < Real.log 139 / Real.log 29 := div_pos (Real.log_pos (by norm_num)) l29
+  have d8 : (0 : ℝ) < Real.log 127 / Real.log 9 := div_pos (Real.log_pos (by norm_num)) l9
+  have d9 : (0 : ℝ) < Real.log 139 / Real.log 22 := div_pos (Real.log_pos (by norm_num)) l22
   have hden : (0 : ℝ) <
       1 + 6 * (Real.log 7 / Real.log 6 + Real.log 19 / Real.log 3 + Real.log 31 / Real.log 9 +
-        Real.log 43 / Real.log 6 + Real.log 67 / Real.log 15 + Real.log 79 / Real.log 17 +
-        Real.log 103 / Real.log 13 + Real.log 127 / Real.log 13 +
-        Real.log 139 / Real.log 29) := by linarith
+        Real.log 43 / Real.log 6 + Real.log 67 / Real.log 14 + Real.log 79 / Real.log 17 +
+        Real.log 103 / Real.log 13 + Real.log 127 / Real.log 9 +
+        Real.log 139 / Real.log 22) := by linarith
   rw [alpha6_eq, lt_div_iff₀ hden]
   linarith [logLo6_7, logLo6_19, logLo6_31, logLo6_43, logLo6_67, logLo6_79, logLo6_103,
     logLo6_127, logLo6_139, logHi6_7, logHi6_19, logHi6_31, logHi6_43, logHi6_67, logHi6_79,
     logHi6_103, logHi6_127, logHi6_139]
 
-/-- **A decimal lower bound at `k = 4`:** `0.9103 < alpha 4 pool4` (the true value is
-`0.910358…`). -/
-theorem alpha4_gt_internal : (0.9103 : ℝ) < alpha 4 pool4 :=
+/-- **A decimal lower bound at `k = 4`:** `0.9121 < alpha 4 pool4` (the true value is
+`0.912145043…`). -/
+theorem alpha4_gt_internal : (0.9121 : ℝ) < alpha 4 pool4 :=
   lt_trans (by norm_num) alpha4_gt_rational
 
 /-- **The exponent at `k = 4` exceeds the transfer value** `(3 + log 6 / log 17) / 4 =
@@ -485,12 +503,12 @@ theorem alpha4_gt_internal : (0.9103 : ℝ) < alpha 4 pool4 :=
 residues modulo `17`. -/
 theorem alpha4_gt_transfer_internal :
     (3 + Real.log 6 / Real.log 17) / 4 < alpha 4 pool4 := by
-  have h : (3 + Real.log 6 / Real.log 17) / 4 < (0.91033 : ℝ) := by linarith [logHi_transfer4]
+  have h : (3 + Real.log 6 / Real.log 17) / 4 < (0.91212 : ℝ) := by linarith [logHi_transfer4]
   exact h.trans alpha4_gt_rational
 
-/-- **A decimal lower bound at `k = 6`:** `0.9507 < alpha 6 pool6` (the true value is
-`0.950739…`). -/
-theorem alpha6_gt_internal : (0.9507 : ℝ) < alpha 6 pool6 :=
+/-- **A decimal lower bound at `k = 6`:** `0.9508 < alpha 6 pool6` (the true value is
+`0.950825559…`). -/
+theorem alpha6_gt_internal : (0.9508 : ℝ) < alpha 6 pool6 :=
   lt_trans (by norm_num) alpha6_gt_rational
 
 /-- **The exponent at `k = 6` exceeds the transfer value** `(5 + log 6 / log 13) / 6 =
@@ -498,7 +516,7 @@ theorem alpha6_gt_internal : (0.9507 : ℝ) < alpha 6 pool6 :=
 residues modulo `13`. -/
 theorem alpha6_gt_transfer_internal :
     (5 + Real.log 6 / Real.log 13) / 6 < alpha 6 pool6 := by
-  have h : (5 + Real.log 6 / Real.log 13) / 6 < (0.95071 : ℝ) := by linarith [logHi_transfer6]
+  have h : (5 + Real.log 6 / Real.log 13) / 6 < (0.95081 : ℝ) := by linarith [logHi_transfer6]
   exact h.trans alpha6_gt_rational
 
 end KthPower
