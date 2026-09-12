@@ -9,9 +9,10 @@ residues: Ruzsa (*Difference sets without squares*, 1984) transfers a k-th-power
 set of `r` residues modulo a square-free `m` into `D_k(N) ≫ N^((k − 1 + log_m r) / k)`, and
 Krachun (*Square-Difference-Free Sets beyond the Three-Quarter Barrier*, arXiv:2608.01325, for
 `k = 2`) replaced independent residue sets by residue sets whose induced digraph is *acyclic*,
-carried with a ranking that strictly decreases along every arc. This file states Krachun's
-construction at every `k`, together with two instances, at `k = 4` and `k = 6`, whose exponents
-exceed the corresponding transfer values.
+carried with a ranking that strictly decreases along every arc; his paper treats squares only.
+This file states a general-`k` form of that ranked-block construction (the general statement and
+its instances are this development's, not the source's), together with two instances, at `k = 4`
+and `k = 6`, whose exponents exceed the corresponding transfer values.
 
 ## The objects
 

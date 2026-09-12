@@ -29,7 +29,8 @@ Theorem 1.4). Krachun (*Square-Difference-Free Sets beyond the Three-Quarter Bar
 arXiv:2608.01325, 2 Aug 2026) replaced the independent residue set by a residue set whose induced
 digraph under "the difference is a nonzero square" is *acyclic*, carried with a ranking that
 strictly decreases along every arc, and appended the rank as a high digit; his text treats squares
-only. This repository states and proves that construction at every `k`, and instantiates it at
+only. This repository states and proves a general-`k` form of that construction — the general
+statement and its instances are this development's, not the source's — and instantiates it at
 `k = 4` and `k = 6`.
 
 ## What is proved

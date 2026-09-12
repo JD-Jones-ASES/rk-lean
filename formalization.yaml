@@ -36,10 +36,12 @@ sources:
     id: "arXiv:2608.01325"
     type: "article"
     location: "https://arxiv.org/abs/2608.01325"
-    relationship: "formalizes"
+    relationship: "adapts"
     author_endorsement: "not-contacted"
     note: >-
-      v1, 2 Aug 2026; no journal reference as of 2026-09-12. His Definition 2 (Paley chain) and
+      v1, 2 Aug 2026; no journal reference as of 2026-09-12. Adapted, not formalized as stated:
+      the paper treats squares (k = 2) only, and its Theorem 1 is not re-derived here; the
+      general-k statement and the two instances are this development's. His Definition 2 (Paley chain) and
       Lemma 3 (a local ranked block) are the ranked block formalized here as
       ValidRankedSupport / RankedBlock; his Lemma 4 (appending the rank as a high digit) and
       Lemma 5 (gluing coprime moduli by the Chinese remainder theorem) are generalized from the
@@ -136,28 +138,25 @@ sources:
       v2, 10 Jan 2025. The best known upper bound at k = 2, |A| << N exp(-c sqrt(log N)); the
       other side of the problem, not formalized here. Several secondary sources render the title
       as "Improved bounds..."; the arXiv listing title is "New bounds...".
-  - title: "fs-formal: a Lean formalization for the Furstenberg–Sárközy problem, exponent 0.7537 < alphaInf"
-    authors: ["JD Jones"]
-    id: "PALOMAR-2026-08-26-000004"
-    type: "formalization"
-    relationship: "prior-work"
-    author_endorsement: "self"
+
+related_formalizations:
+  - id: "PALOMAR-2026-08-26-000004"
+    relationship: "builds-on"
     note: >-
-      Registered 2026-08-26. The k = 2 case of the same construction: an eleven-block pool and
-      the exponent 0.7537415..., proved to exceed Krachun's 0.752796455875.... This repository is
-      the general-k development on that architecture; the eleven-block pool of that entry satisfies
-      the pool conditions of the theorem proved here at k = 2 (not re-verified in this repository),
+      fs-formal (JD Jones, registered 2026-08-26): the k = 2 case of the same construction, an
+      eleven-block pool and the exponent 0.7537415..., proved to exceed Krachun's
+      0.752796455875.... This repository is the general-k development on that architecture (the
+      digit lift, the word construction, the CRT glue, the allocation and the numeric layer, each
+      with the digit stride 2 replaced by k); the eleven-block pool of that entry satisfies the
+      pool conditions of the theorem proved here at k = 2 (not re-verified in this repository),
       and no k = 2 statement is re-derived.
-  - title: "ry-lean: sets avoiding {x, x+y, x+y²} — Younis's two-set construction and the exponent 0.77028"
-    authors: ["JD Jones"]
-    id: "PALOMAR-2026-09-11-000003"
-    type: "formalization"
-    relationship: "prior-work"
-    author_endorsement: "self"
+  - id: "PALOMAR-2026-09-11-000003"
+    relationship: "other"
     note: >-
-      Registered 2026-09-11. A different configuration (nonlinear Roth, not k-th-power
-      differences); cited as prior art in this problem area and as the pattern for the
-      one-repository registry layout, the axiom audit and the source guard used here.
+      ry-lean (JD Jones, registered 2026-09-11): a different configuration (nonlinear Roth
+      {x, x+y, x+y^2}, not k-th-power differences); cited as prior art in this problem area and
+      as the pattern for the one-repository registry layout, the axiom audit and the source guard
+      used here. No mathematics is shared.
 
 status:
   scope: >-
