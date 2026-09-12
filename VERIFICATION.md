@@ -44,7 +44,7 @@ At this snapshot the audit reported (reproduce with `lake build Test`; the line 
 `Test/Axioms.lean`):
 
 ```
-Audited <<AUDIT_COUNT>> project constants; unexpected axiom dependencies: 0.
+Audited 529 project constants; unexpected axiom dependencies: 0.
 ```
 
 **Non-default options.** The development sets, in total: `autoImplicit false` and
