@@ -144,7 +144,7 @@ and reading nothing from the Lean sources:
 * controls that must fail: a block with one rank raised to equal its predecessor's, and a block
   with one vertex moved. A checker that accepted these would be vacuous.
 
-At this snapshot it reports `235 checks, 0 failed` and exits `0`.
+At this snapshot it reports `253 checks, 0 failed` and exits `0`.
 
 ## Not checked here
 
