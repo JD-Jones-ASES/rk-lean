@@ -7,8 +7,9 @@ Standard library only, Python >= 3.9.  Run it from anywhere:
 
 What it checks, from the numbers alone:
 
-1.  Every block of every pool is a ranked support: vertices are distinct residues below the
-    modulus, the vertex 0 is present (the supports are normalised by translation), every rank is
+1.  Every block of every pool is a nonempty ranked support: the support list is not empty,
+    vertices are distinct residues below the modulus, the vertex 0 is present (the supports are
+    normalised by translation, which also makes nonemptiness visible), every rank is
     below the stated height, and along every arc -- every ordered pair of vertices whose
     difference is a nonzero k-th-power residue modulo m -- the rank strictly drops.  A ranking
     that strictly drops along every arc exists only for an acyclic digraph, so the blocks are
@@ -225,6 +226,7 @@ for k in (4, 6):
     for (m, sup, H) in POOLS[k]:
         ok, why = block_is_valid(k, m, sup, H)
         check(ok, "k = %d, m = %d: %s" % (k, m, why))
+        check(len(sup) > 0, "k = %d, m = %d: support nonempty" % (k, m))
         check(is_squarefree(m), "k = %d: modulus %d is square-free" % (k, m))
         check(H >= 2, "k = %d, m = %d: height at least 2" % (k, m))
         check(m >= 2, "k = %d, m = %d: modulus at least 2" % (k, m))
