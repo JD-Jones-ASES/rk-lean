@@ -42,9 +42,10 @@ statement and its instances are this development's, not the source's — and ins
 
   and `N^ρ ≤ D_k(N)` for all sufficiently large `N` whenever `ρ < alpha k P`. A pool is a nonempty
   list of blocks `(m, sup, H)` with pairwise coprime square-free moduli `m ≥ 2`, heights `H ≥ 2`,
-  and `sup` a list of `(vertex, rank)` pairs with distinct vertices below `m`, ranks below `H`, and
-  a strict rank drop along every arc — every ordered pair of vertices whose difference is a nonzero
-  k-th-power residue modulo `m`. Writing `t` for the number of vertices of a block, the exponent is
+  and `sup` a nonempty list of `(vertex, rank)` pairs with distinct vertices below `m`, ranks below
+  `H`, and a strict rank drop along every arc — every ordered pair of vertices whose difference is
+  a nonzero k-th-power residue modulo `m`. Writing `t ≥ 1` for the number of vertices of a block,
+  the exponent is
 
       alpha k P = (Σ ((k−1) log m + log t) / log H) / (1 + k Σ log m / log H).
 
@@ -71,10 +72,13 @@ All ten are unconditional theorems, kernel-checked with no axioms beyond `propex
 
 **Blocks and ranking.** Fix a square-free modulus `m` and let `Q` be the set of nonzero
 k-th-power residues modulo `m` — the full image of `z ↦ z^k` on `ℤ/m` with `0` removed, non-units
-included. A *block* is a set `S` of residues together with a ranking `h : S → {0, …, H−1}` such
-that `y − x ∈ Q` forces `h(y) < h(x)`. Such a ranking exists exactly when the digraph on `S` with
-those arcs is acyclic, so acyclicity is not a separate hypothesis; it is what having a ranking
-means. Ruzsa's transfer is the case of a block with no arcs at all — an independent residue set,
+included. A *block* is a nonempty set `S` of residues together with a ranking
+`h : S → {0, …, H−1}` such that `y − x ∈ Q` forces `h(y) < h(x)`. Such a ranking exists exactly
+when the digraph on `S` with those arcs is acyclic, so acyclicity is not a separate hypothesis; it
+is what having a ranking means. The smallest genuine block is a single vertex, with `t = 1`; the
+nonemptiness requirement only rules out a block that would contribute no vertices to count while
+still being scored by the exponent formula (see [PROOF.md](PROOF.md) §1).
+Ruzsa's transfer is the case of a block with no arcs at all — an independent residue set,
 for which any ranking will do — and the point of the directed method is that a block may be much
 larger than any independent set, at the cost of a height `H > 1` that has to be paid for in the
 denominator of the exponent.

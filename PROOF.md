@@ -5,10 +5,10 @@ mathematical language. Every numbered Theorem, Lemma and Proposition below is pr
 no axioms beyond `propext`, `Classical.choice` and `Quot.sound`, and each step names the Lean
 declaration that carries it. Every declaration named here lives in the namespace `KthPower`.
 
-Two kinds of remark are exposition rather than content: the comparisons with the literature (§1,
-end, and §8) and the parity discussion of §2 are true but are not what the Lean proves — the Lean
-theorems are stated for every `k ≥ 2` with no parity condition. §10 maps the modules to the
-sections.
+Three kinds of remark are exposition rather than content: the comparisons with the literature at
+the end of §1, the remark there on why the supports are required to be nonempty, and the parity
+discussion of §2. All three are true, but none is what the Lean proves — the Lean theorems are
+stated for every `k ≥ 2` with no parity condition. §11 maps the modules to the sections.
 
 ## 1. Definitions and statements
 
@@ -42,13 +42,23 @@ arcs is acyclic, because a ranking that strictly decreases along every arc exist
 not a separate condition, it is what having such a ranking means.
 
 A **pool** for `k` is a nonempty list `P` of blocks `(m, sup, H)` whose moduli are pairwise
-coprime, with each `m ≥ 2` square-free, each `H ≥ 2`, and each `sup` a ranked support modulo `m`
-of height `H` (`ValidPool`). Writing `t` for the number of vertices of a block, the **exponent of
-a pool** is
+coprime, with each `m ≥ 2` square-free, each `H ≥ 2`, and each `sup` a **nonempty** ranked support
+modulo `m` of height `H` (`ValidPool`). Writing `t ≥ 1` for the number of vertices of a block, the
+**exponent of a pool** is
 
     alpha k P = ( Σ_i ((k−1) log m_i + log t_i) / log H_i ) / ( 1 + k Σ_i log m_i / log H_i )
 
 (`alpha`).
+
+**Why the supports are required to be nonempty.** The two conditions on a ranked support are
+vacuous on the empty list, so without the extra clause `(m, [], H)` would count as a block — and
+the two sides of the construction would then disagree about it. The exponent formula would score
+it as a one-vertex block, because `log t = Real.log 0 = 0 = Real.log 1` in Mathlib's convention,
+while the counting argument would take a product over the blocks containing a factor of `t = 0`
+and produce a stage of size `0`. Requiring `sup ≠ []` removes that case and nothing else: a block
+with a single vertex is admitted, is the smallest genuine block, and contributes `log 1 = 0` to the
+numerator honestly. So the hypothesis is a tightening of the definition, not a restriction on the
+construction — every pool anyone would write down already satisfies it, and both pools below do.
 
 **Theorem A (the directed construction at every `k`, pointwise form).** Let `k ≥ 2` and let `P` be
 a pool for `k`. Then for every real `ρ < alpha k P` one has `N^ρ ≤ D_k(N)` for all sufficiently
@@ -108,7 +118,8 @@ interval order is itself a ranking. `pool4`'s block at `m = 51 = 3 · 17` is thi
 {1, 4, 13, 16, 18, 21, 30, 33, 34}` has maximum `34`, so the `17` residues `35, …, 50, 0` form a
 block of height `17`. Its modulus is square-free but not prime, and `Q_4(51)` is not antisymmetric
 (`18` and `33 = −18` both lie in it) — the interval argument is doing the work, and Theorem A needs
-nothing else, since `ValidPool` asks only for square-freeness, coprimality and the ranking.
+nothing else, since `ValidPool` asks only for square-freeness, coprimality, a nonempty support and
+the ranking.
 
 Inside the proofs, `k` does real work at exactly one place: Step 2 of Lemma A, where the valuation
 of a nonzero k-th-power residue is shown to be a multiple of `k`. Everywhere else it is threaded
@@ -289,7 +300,7 @@ Write `stageExponent = log stageCard / log (stageModulus · stageHeight)` (`stag
 (`log_natPow_mul`), `alpha k P = alphaNum / alphaDen` (`alpha_eq_ratio`), and the denominator is
 `≥ 1` (`alphaDen_pos`).
 
-**Proposition G (the limit).** For a pool with no empty support, with the allocation
+**Proposition G (the limit).** For a pool `P`, with the allocation
 `e_i(U) = ⌊U / log H_i⌋` (`alloc`),
 
     stageExponent k P (alloc U) → alpha k P   as U → ∞.
@@ -330,8 +341,9 @@ sufficiently large `N`. — `passage` (a private lemma of `RK/Asymptotics.lean`)
 `N^{α−ρ} → ∞`, and that absorption is exactly where `ρ < α` is spent. ∎
 
 Combining Proposition F (at `B = stageModulus · stageHeight`, `C = stageCard`) with Corollary H
-and Proposition I gives Theorem A for a pool with no empty support (`stage_pointwise`,
-`pointwise_of_ne_nil`), and §9 removes that proviso, yielding `pointwise_internal` — Theorem A.
+and Proposition I gives Theorem A — `pointwise_internal`. Every step of the chain uses the
+nonemptiness of the supports only through `|C| ≥ 1` for each block, which `ValidPool` now supplies
+directly (see the remark at the end of §1).
 
 Theorem B follows. The sequence `u_N = log D_k(N) / log N` satisfies `u_N ≤ 1` for `N ≥ 2`, since
 `D_k(N) ≤ N` (`D_le`), so it is cobounded above; for each `ρ < alpha k P`, Theorem A gives
@@ -339,26 +351,7 @@ Theorem B follows. The sequence `u_N = log D_k(N) / log N` satisfies `u_N ≤ 1`
 `alpha k P ≤ liminf u` (`liminf_internal`). The boundedness step is not decoration: without it
 `Filter.le_liminf_of_le` does not apply.
 
-## 9. The empty-support normalisation
-
-`ValidPool` does not forbid an empty support list: the three conditions of a ranked support are
-vacuous on the empty list, so `(m, [], H)` is a legal block. The counting argument, however, wants
-every block to have a vertex — `liftBlock_card` and the positivity facts `one_lt_stageCard` all
-read `|C| ≥ 1`. Normalising is harmless:
-
-    fixEntry (m, sup, H) = if sup = [] then (m, [(0,0)], H) else (m, sup, H),    fixPool = map fixEntry
-
-(`fixEntry`, `fixPool`). The single vertex `0` at rank `0` is a ranked support modulo any `m ≥ 2`
-of any height `H ≥ 2` — there is one vertex, so the arc condition is vacuous — and the moduli and
-heights are untouched, so `fixPool P` is again a pool (`fixPool_valid`) with no empty support
-(`fixPool_sup_ne_nil`). It has the same exponent: the only quantity that moves is `log t` at a
-block with `t = 0`, and in Mathlib's convention `Real.log 0 = 0 = Real.log 1`
-(`alpha_fixPool`). Theorem A for a general pool is therefore Theorem A for `fixPool P`.
-
-This is the one place where a Mathlib convention is load-bearing, and it is load-bearing in the
-harmless direction: a block with no vertices contributes nothing either way.
-
-## 10. The numeric layer
+## 9. The numeric layer
 
 `alpha k P` is a ratio of sums of ratios of logarithms. No floating-point or interval arithmetic
 appears anywhere in the development. The one idea is that a rational bound on a ratio of
@@ -381,9 +374,11 @@ in the shape
 
 so a lower bound needs a rational lower bound `ρ_i` for each `log a_i / log H_i` and a rational
 upper bound `σ_i` for each `log m_i / log H_i`; then `alpha ≥ (Σ ρ_i)/(1 + k Σ σ_i)`, a rational
-number, and the assembly is `norm_num` and `linarith` on small numbers
-(`alpha4_gt_rational`, `alpha6_gt_rational`). Each `ρ_i`, `σ_i` below is a best rational
-approximation with denominator at most `400`.
+number, and the assembly is `norm_num` and `linarith` on small numbers. The two core theorems
+`alpha4_gt_rational` and `alpha6_gt_rational` state a decimal just underneath each assembled
+rational — `0.91212` and `0.95081` — from which the four pinned inequalities follow by one more
+rational comparison. Each `ρ_i`, `σ_i` below is a best rational approximation with denominator at
+most `400`.
 
 **`k = 4`** (`logLo4_*`, `logHi4_*`):
 
@@ -432,11 +427,12 @@ four numbers on one line, since each lemma is one translation plus one kernel co
 comparisons as an exact integer comparison, and redoes the rational assembly, independently of
 Lean.
 
-## 11. The two pools, as finite checks
+## 10. The two pools, as finite checks
 
-`ValidPool k P` has four parts, each checked in the way that suits it (`RK/Pools.lean`):
-non-emptiness and pairwise coprimality of the moduli are computations on the stored numerals,
-settled by `decide`; `m ≥ 2` and `H ≥ 2` are `norm_num`; `Squarefree m` is read off the
+`ValidPool k P` has five parts, each checked in the way that suits it (`RK/Pools.lean`):
+non-emptiness of the pool and pairwise coprimality of the moduli are computations on the stored
+numerals, settled by `decide`; non-emptiness of each support is immediate from the stored list, the
+cheapest of the five; `m ≥ 2` and `H ≥ 2` are `norm_num`; `Squarefree m` is read off the
 factorisation — for the seventeen prime moduli from primality, which `norm_num` proves and which
 implies square-freeness, and for `51 = 3 · 17` from the two distinct prime factors; either route is
 cheaper than the decidability instance for `Squarefree`, which factors by search. Finally
@@ -449,7 +445,7 @@ largest is the 34-vertex support at `139`.
 The blocks are lower-bound witnesses. Nothing here claims that a support is largest possible or
 that a height is least possible.
 
-## 12. Modules and sections
+## 11. Modules and sections
 
 | Module | Sections |
 | --- | --- |
@@ -460,9 +456,9 @@ that a height is least possible.
 | `RK/LemmaB.lean` | §4 |
 | `RK/LemmaC.lean` | §5 |
 | `RK/Construction.lean` | §6 |
-| `RK/Asymptotics.lean` | §7, §8, §9 |
-| `RK/Pools.lean` | §11 |
-| `RK/Numeric.lean` | §10 |
+| `RK/Asymptotics.lean` | §7, §8 |
+| `RK/Pools.lean` | §10 |
+| `RK/Numeric.lean` | §9 |
 | `RK/Main.lean` | the ten targets, assembled |
 | `Solution.lean` | the ten statements of `Challenge.lean`, restated verbatim |
 

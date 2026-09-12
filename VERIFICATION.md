@@ -44,7 +44,7 @@ At this snapshot the audit reported (reproduce with `lake build Test`; the line 
 `Test/Axioms.lean`):
 
 ```
-Audited 542 project constants; unexpected axiom dependencies: 0.
+Audited <<AUDIT_COUNT>> project constants; unexpected axiom dependencies: 0.
 ```
 
 **Non-default options.** The development sets, in total: `autoImplicit false` and
@@ -130,7 +130,8 @@ A standalone script (Python ≥ 3.9, standard library only) that re-derives, fro
 and reading nothing from the Lean sources:
 
 * every block of both pools is a ranked support — distinct vertices below the modulus, the vertex
-  `0` present, every rank below the stated height, and a strict rank drop along every arc — with
+  `0` present (which also witnesses the nonemptiness `ValidPool` requires of every support),
+  every rank below the stated height, and a strict rank drop along every arc — with
   the set of nonzero k-th-power residues recomputed as the full image of `z ↦ z^k mod m` over
   `z < m` with `0` removed, exactly as in the formal definition;
 * every modulus is square-free — the seventeen prime moduli by primality, and `51 = 3 · 17` by its

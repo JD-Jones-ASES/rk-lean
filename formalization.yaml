@@ -8,13 +8,13 @@ project:
     integers with no k-th-power difference, stated and proved for every exponent k >= 2. Let
     D_k(N) be the largest size of a subset of {1,...,N} no two of whose elements differ by a
     nonzero perfect k-th power. A pool for k is a nonempty list of blocks (m, sup, H) with
-    pairwise coprime square-free moduli m >= 2, heights H >= 2, and sup a list of
+    pairwise coprime square-free moduli m >= 2, heights H >= 2, and sup a nonempty list of
     (vertex, rank) pairs with distinct vertices below m, ranks below H, and a strict rank drop
     along every ordered pair of vertices whose difference is a nonzero k-th-power residue mod m
     (so the induced digraph is acyclic). For every such pool,
     alpha k P <= liminf log D_k(N)/log N, where
-    alpha k P = (sum ((k-1) log m + log t)/log H) / (1 + k sum log m / log H) and t is the number
-    of vertices of a block; and N^rho <= D_k(N) for all large N whenever rho < alpha k P. The
+    alpha k P = (sum ((k-1) log m + log t)/log H) / (1 + k sum log m / log H) and t >= 1 is the
+    number of vertices of a block; and N^rho <= D_k(N) for all large N whenever rho < alpha k P. The
     theorem is instantiated at k = 4 with nine blocks, eight on the primes 5, 13, 29, 37, 53, 61,
     101, 109 and one at the composite square-free modulus 51 = 3 * 17, and at k = 6 with nine
     blocks on the primes 7, 19, 31, 43, 67, 79, 103, 127, 139, giving the
@@ -162,8 +162,9 @@ status:
   scope: >-
     Ten compared declarations over nine compared definitions. directed_liminf and
     directed_pointwise are the general theorem: for every k >= 2 and every pool for k (a nonempty
-    list of blocks on pairwise coprime square-free moduli with a ranking strictly decreasing along
-    every k-th-power-residue arc), alpha k P <= liminf log D_k(N)/log N, and N^rho <= D_k(N)
+    list of blocks on pairwise coprime square-free moduli, each with a nonempty support carrying a
+    ranking strictly decreasing along every k-th-power-residue arc), alpha k P <= liminf
+    log D_k(N)/log N, and N^rho <= D_k(N)
     eventually for every rho < alpha k P. pool4_valid and pool6_valid are the finite verifications
     of the two concrete pools. alpha4_gt_transfer, alpha4_gt, alpha6_gt_transfer and alpha6_gt are
     inequalities between real numbers defined by logarithms. fourth_power_liminf and
@@ -269,8 +270,12 @@ fidelity:
     Finset ℕ and residues are natural numbers below the modulus, so that every finite claim stays
     decidable; D k N is a supremum of Finset.card over the k-th-power-difference-free subsets of
     Finset.Icc 1 N, and no range is stated as an interval in ℤ (instance diamonds are avoided by
-    stating ranges as bounds). ValidPool admits a block with an empty support, which the proof
-    normalises away internally without changing the exponent. ValidPool asks its moduli to be
+    stating ranges as bounds). Every support is required to be nonempty, so the exponent formula
+    has no degenerate case: without that clause the two conditions on a ranked support would be
+    vacuous on the empty list, the formula would score such a block as one vertex (Real.log 0 = 0
+    = Real.log 1) while the counting argument would produce a stage of size 0, and the two sides
+    would disagree; a one-vertex block, the smallest genuine block, is still admitted. ValidPool
+    asks its moduli to be
     square-free and pairwise coprime, not prime, and pool4 uses that latitude: its block at
     51 = 3 * 17 is an interval of 17 consecutive residues, acyclic because every backward
     difference along the interval exceeds the largest fourth-power residue mod 51, not because the
@@ -299,7 +304,8 @@ alignment:
       status: "proved"
       note: >-
         Hypotheses: k >= 2 and ValidPool k P (nonempty list of blocks (m, sup, H); moduli pairwise
-        coprime, each m >= 2 square-free; each H >= 2; each sup a list of (vertex, rank) pairs with
+        coprime, each m >= 2 square-free; each H >= 2; every support nonempty; each sup a list of
+        (vertex, rank) pairs with
         distinct vertices below m, ranks below H, and rank(y) < rank(x) whenever the residue of
         y - x is a nonzero k-th-power residue mod m). Conclusion:
         alpha k P <= liminf log (D k N) / log N along atTop. Generalizes the source from k = 2; the
@@ -317,13 +323,14 @@ alignment:
       module: "Solution"
       status: "proved"
       note: >-
-        ValidPool 4 pool4, by decide on each of the nine blocks plus coprimality of the moduli and
-        square-freeness (primality for the eight primes, the factorisation 3 * 17 for 51).
+        ValidPool 4 pool4, by decide on each of the nine blocks plus coprimality of the moduli,
+        nonemptiness of every support, and square-freeness (primality for the eight primes, the
+        factorisation 3 * 17 for 51).
     - source: "Not in any source: new instances. Nine blocks on the primes 7, 19, 31, 43, 67, 79, 103, 127, 139, all congruent to 7 mod 12"
       lean: "KthPower.pool6_valid"
       module: "Solution"
       status: "proved"
-      note: "ValidPool 6 pool6, by decide on each of the nine blocks plus coprimality and primality of the moduli."
+      note: "ValidPool 6 pool6, by decide on each of the nine blocks plus coprimality and primality of the moduli and nonemptiness of every support."
     - source: "Comparison with the Ruzsa transfer value at k = 4 from six fourth-power-difference-free residues mod 17 (Ruzsa, doi:10.1007/BF02454169, Theorem 2; the six-element set mod 17 is exhibited in README.md and appears in no publication found)"
       lean: "KthPower.alpha4_gt_transfer"
       module: "Solution"
