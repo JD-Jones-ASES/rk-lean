@@ -1,0 +1,6 @@
+.lake/
+__pycache__/
+*.pyc
+.DS_Store
+/scratch/
+/*.scratch.lean

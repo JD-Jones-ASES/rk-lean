@@ -1,0 +1,27 @@
+name = "rkLean"
+version = "0.1.0"
+keywords = ["mathematics", "combinatorics", "number-theory", "palomar"]
+defaultTargets = ["RK", "Challenge", "Solution", "Test"]
+
+[leanOptions]
+autoImplicit = false
+relaxedAutoImplicit = false
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+git = "https://github.com/leanprover-community/mathlib4.git"
+# lake-manifest.json pins this tag to commit db584cd6d46c92f209a44c0f1c829460d327499d.
+rev = "v4.33.0"
+
+[[lean_lib]]
+name = "RK"
+
+[[lean_lib]]
+name = "Challenge"
+
+[[lean_lib]]
+name = "Solution"
+
+[[lean_lib]]
+name = "Test"
