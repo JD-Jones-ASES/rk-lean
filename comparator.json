@@ -1,0 +1,29 @@
+{
+  "challenge_module": "Challenge",
+  "solution_module": "Solution",
+  "theorem_names": [
+    "KthPower.directed_liminf",
+    "KthPower.directed_pointwise",
+    "KthPower.pool4_valid",
+    "KthPower.pool6_valid",
+    "KthPower.alpha4_gt_transfer",
+    "KthPower.alpha4_gt",
+    "KthPower.alpha6_gt_transfer",
+    "KthPower.alpha6_gt",
+    "KthPower.fourth_power_liminf",
+    "KthPower.sixth_power_liminf"
+  ],
+  "definition_names": [
+    "KthPower.IsNonzeroPowerMod",
+    "KthPower.diffMod",
+    "KthPower.ValidRankedSupport",
+    "KthPower.ValidPool",
+    "KthPower.alpha",
+    "KthPower.PowerDifferenceFree",
+    "KthPower.D",
+    "KthPower.pool4",
+    "KthPower.pool6"
+  ],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
+  "enable_nanoda": true
+}
