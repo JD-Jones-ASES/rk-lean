@@ -48,11 +48,12 @@ instance instDecidableValidRankedSupport (k m : ℕ) (sup : List (ℕ × ℕ)) (
   unfold ValidRankedSupport; infer_instance
 
 /-- A pool for `k`: a nonempty list of blocks `(m, sup, H)` whose moduli are pairwise coprime,
-each modulus `m ≥ 2` square-free, each height `H ≥ 2`, and each `sup` a ranked support modulo
-`m` of height `H`. -/
+each modulus `m ≥ 2` square-free, each height `H ≥ 2`, and each `sup` a nonempty ranked support
+modulo `m` of height `H`. -/
 def ValidPool (k : ℕ) (P : List (ℕ × List (ℕ × ℕ) × ℕ)) : Prop :=
   P ≠ [] ∧ (P.map Prod.fst).Pairwise Nat.Coprime ∧
-  ∀ b ∈ P, 2 ≤ b.1 ∧ Squarefree b.1 ∧ 2 ≤ b.2.2 ∧ ValidRankedSupport k b.1 b.2.1 b.2.2
+  ∀ b ∈ P, 2 ≤ b.1 ∧ Squarefree b.1 ∧ 2 ≤ b.2.2 ∧ b.2.1 ≠ [] ∧
+    ValidRankedSupport k b.1 b.2.1 b.2.2
 
 /-- The exponent of a pool: `(Σ ((k − 1) log m + log t) / log H) / (1 + k Σ log m / log H)`,
 where `t` is the length of the block's support list (its number of vertices, the vertices being
