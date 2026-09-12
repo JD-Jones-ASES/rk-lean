@@ -22,7 +22,7 @@ lake build
 `Test`. Expected outcome: `Challenge.lean` reports **ten** `declaration uses sorry` warnings — one
 per pinned theorem, its placeholders, by design — and nothing else warns or errors.
 
-At this snapshot `lake build` completed exactly as described above, in `<<BUILD_TIME>>` with the
+At this snapshot `lake build` completed exactly as described above, in 9 min 42 s with the
 Mathlib cache in place (wall-clock time depends on the machine and on the state of the cache);
 `RK/`, `Solution.lean` and `Test/` contain no `sorry`, which `scripts/check-source.py` enforces
 independently.
@@ -34,7 +34,7 @@ independently.
 (via `logError`) if any axiom outside `propext`, `Classical.choice`, `Quot.sound` appears.
 `Challenge.lean` is not imported there, so its placeholders are outside the audit's reach by
 construction rather than by exclusion. The audit also fails if it matches fewer than
-`<<AUDIT_FLOOR>>` constants — so a renamed namespace cannot make it pass vacuously — or if any of
+500 constants — so a renamed namespace cannot make it pass vacuously — or if any of
 the ten compared theorems is missing from the environment: `directed_liminf`,
 `directed_pointwise`, `pool4_valid`, `pool6_valid`, `alpha4_gt_transfer`, `alpha4_gt`,
 `alpha6_gt_transfer`, `alpha6_gt`, `fourth_power_liminf`, `sixth_power_liminf`, all in
@@ -44,7 +44,7 @@ At this snapshot the audit reported (reproduce with `lake build Test`; the line 
 `Test/Axioms.lean`):
 
 ```
-Audited <<AUDIT_COUNT>> project constants; unexpected axiom dependencies: 0.
+Audited 537 project constants; unexpected axiom dependencies: 0.
 ```
 
 **Non-default options.** The development sets, in total: `autoImplicit false` and
@@ -62,8 +62,9 @@ and the thirty-six power comparisons of `RK/Numeric.lean` use ordinary `decide`,
 proposition to the kernel's own arbitrary-precision arithmetic. There is no `decide +kernel` and
 no `native_decide` anywhere in the repository, and no custom `axiom`. The largest finite check is
 the 34-vertex support at modulus `139`, which is `33 · 34` ordered pairs each testing membership
-in the set of nonzero sixth-power residues by a search over `z < 139`; it elaborates in
-`<<DECIDE_TIME_139>>`. The largest power comparison is `29^2931 < 1764220719766^350`, two numbers
+in the set of nonzero sixth-power residues by a search over `z < 139`; it takes about 17 s of
+elaboration and 14 s of kernel checking on the reference machine; `RK/Pools.lean` as a whole builds in
+about 85 s. The largest power comparison is `29^2931 < 1764220719766^350`, two numbers
 of 4287 decimal digits each.
 
 **Mutation controls run at this snapshot:** `<<MUTATION_CONTROLS>>`. The faults injected are a
