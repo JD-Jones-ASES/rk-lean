@@ -18,11 +18,7 @@ run_cmd do
   let env ← getEnv
   let mut checked : Nat := 0
   let mut rejected : Nat := 0
-  -- TODO desk: delete `sorryAx` from this list once the development is placeholder-free.
-  -- While the modules still carry placeholders it is here so that they are reported as
-  -- `sorry` warnings by `lake build` rather than as audit errors; the finished tree must
-  -- not need it, and removing it is what turns the audit back into a real check.
-  let allowed : Array Name := #[`propext, `Classical.choice, `Quot.sound, `sorryAx]
+  let allowed : Array Name := #[`propext, `Classical.choice, `Quot.sound]
   for (name, _) in env.constants.toList do
     let label := name.toString
     if label.startsWith "KthPower." || label.startsWith "_private.RK." ||
@@ -33,9 +29,8 @@ run_cmd do
         unless allowed.contains ax do
           rejected := rejected + 1
           logError m!"Unexpected axiom dependency: {name} -> {ax}"
-  -- TODO desk: raise the floor to just below the final count before pinning the docs.
-  unless checked ≥ 0 do
-    logError m!"Axiom audit matched only {checked} project constants; expected more"
+  unless checked ≥ 500 do
+    logError m!"Axiom audit matched only {checked} project constants; expected at least 500"
   for n in [`KthPower.directed_liminf, `KthPower.directed_pointwise,
       `KthPower.pool4_valid, `KthPower.pool6_valid,
       `KthPower.alpha4_gt_transfer, `KthPower.alpha4_gt,
