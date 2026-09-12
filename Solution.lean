@@ -38,8 +38,8 @@ obtained from the six fourth-power-difference-free residues modulo `17`. -/
 theorem alpha4_gt_transfer : (3 + Real.log 6 / Real.log 17) / 4 < alpha 4 pool4 := by
   exact alpha4_gt_transfer_internal
 
-/-- A decimal lower bound for the exponent at `k = 4` (its value is `0.910358…`). -/
-theorem alpha4_gt : (0.9103 : ℝ) < alpha 4 pool4 := by
+/-- A decimal lower bound for the exponent at `k = 4` (its value is `0.912145…`). -/
+theorem alpha4_gt : (0.9121 : ℝ) < alpha 4 pool4 := by
   exact alpha4_gt_internal
 
 /-- The exponent at `k = 6` exceeds the transfer value `(5 + log 6 / log 13) / 6 = 0.949759…`
@@ -47,8 +47,8 @@ obtained from the six sixth-power-difference-free residues modulo `13`. -/
 theorem alpha6_gt_transfer : (5 + Real.log 6 / Real.log 13) / 6 < alpha 6 pool6 := by
   exact alpha6_gt_transfer_internal
 
-/-- A decimal lower bound for the exponent at `k = 6` (its value is `0.950739…`). -/
-theorem alpha6_gt : (0.9507 : ℝ) < alpha 6 pool6 := by
+/-- A decimal lower bound for the exponent at `k = 6` (its value is `0.950826…`). -/
+theorem alpha6_gt : (0.9508 : ℝ) < alpha 6 pool6 := by
   exact alpha6_gt_internal
 
 /-- **Fourth powers:** `alpha 4 pool4 ≤ liminf log D_4(N) / log N`. -/

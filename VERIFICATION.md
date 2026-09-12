@@ -22,7 +22,7 @@ lake build
 `Test`. Expected outcome: `Challenge.lean` reports **ten** `declaration uses sorry` warnings — one
 per pinned theorem, its placeholders, by design — and nothing else warns or errors.
 
-At this snapshot `lake build` completed exactly as described above, in 9 min 42 s with the
+At this snapshot `lake build` completed exactly as described above, in about 10 min with the
 Mathlib cache in place (wall-clock time depends on the machine and on the state of the cache);
 `RK/`, `Solution.lean` and `Test/` contain no `sorry`, which `scripts/check-source.py` enforces
 independently.
@@ -44,7 +44,7 @@ At this snapshot the audit reported (reproduce with `lake build Test`; the line 
 `Test/Axioms.lean`):
 
 ```
-Audited <<AUDIT_COUNT>> project constants; unexpected axiom dependencies: 0.
+Audited 542 project constants; unexpected axiom dependencies: 0.
 ```
 
 **Non-default options.** The development sets, in total: `autoImplicit false` and
@@ -140,7 +140,7 @@ and reading nothing from the Lean sources:
 * controls that must fail: a block with one rank raised to equal its predecessor's, and a block
   with one vertex moved. A checker that accepted these would be vacuous.
 
-At this snapshot it reports `<<CHECK_COUNT>> checks, 0 failed` and exits `0`.
+At this snapshot it reports `235 checks, 0 failed` and exits `0`.
 
 ## Not checked here
 
