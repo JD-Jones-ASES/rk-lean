@@ -8,7 +8,7 @@ on the primes `5, 13, 29, 37, 53, 61, 101, 109` and on the composite modulus `51
 nine for `k = 6`, on the primes `7, 19, 31, 43, 67, 79, 103, 127, 139`. This file proves that each
 is a pool in the sense of `ValidPool`, which is the only property of them the construction uses.
 
-`ValidPool k P` has four parts, and each is checked here in the way that suits it:
+`ValidPool k P` has five parts, and each is checked here in the way that suits it:
 
 * `P ≠ []` and the pairwise coprimality of the moduli are finite computations on the stored
   numerals, settled by `decide`;
@@ -18,6 +18,8 @@ is a pool in the sense of `ValidPool`, which is the only property of them the co
   square-free because it is a product of two coprime square-free numbers (`squarefree_51`). That
   is the cheap route — the decidability instance for `Squarefree` on `ℕ` runs through
   `Nat.minSqFac`, a factoring search, whereas the primality of a three-digit number is immediate;
+* `sup ≠ []` holds by the shape of the stored data: every support is a list literal, so its head
+  constructor is a `cons` and `List.cons_ne_nil` closes the goal in each case;
 * `ValidRankedSupport k m sup H` — distinct vertices below `m`, ranks below `H`, and a strict
   rank drop along every arc — is one pass over the ordered pairs of the support, with the set of
   nonzero k-th-power residues mod `m` recomputed by a search over `z < m` for each pair. That is
@@ -205,44 +207,57 @@ theorem pool4_coprime : (pool4.map Prod.fst).Pairwise Nat.Coprime := by decide
 theorem pool6_coprime : (pool6.map Prod.fst).Pairwise Nat.Coprime := by decide
 
 /-- **`pool4` is a pool for `k = 4`.** Nine blocks on pairwise coprime square-free moduli — eight
-primes and `51 = 3 · 17` — each height at least `2`, and each support a ranked support of its
-stated height for fourth powers. -/
+primes and `51 = 3 · 17` — each height at least `2`, and each support a nonempty ranked support
+of its stated height for fourth powers. -/
 theorem pool4_valid_internal : ValidPool 4 pool4 := by
   refine ⟨pool4_ne_nil, pool4_coprime, ?_⟩
   intro b hb
   simp only [pool4, List.mem_cons, List.not_mem_nil, or_false] at hb
   rcases hb with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · exact ⟨by norm_num, (by norm_num : Nat.Prime 5).squarefree, by norm_num, pool4_block5_valid⟩
-  · exact ⟨by norm_num, (by norm_num : Nat.Prime 13).squarefree, by norm_num, pool4_block13_valid⟩
-  · exact ⟨by norm_num, (by norm_num : Nat.Prime 29).squarefree, by norm_num, pool4_block29_valid⟩
-  · exact ⟨by norm_num, (by norm_num : Nat.Prime 37).squarefree, by norm_num, pool4_block37_valid⟩
-  · exact ⟨by norm_num, squarefree_51, by norm_num, pool4_block51_valid⟩
-  · exact ⟨by norm_num, (by norm_num : Nat.Prime 53).squarefree, by norm_num, pool4_block53_valid⟩
-  · exact ⟨by norm_num, (by norm_num : Nat.Prime 61).squarefree, by norm_num, pool4_block61_valid⟩
+  · exact ⟨by norm_num, (by norm_num : Nat.Prime 5).squarefree, by norm_num,
+      List.cons_ne_nil _ _, pool4_block5_valid⟩
+  · exact ⟨by norm_num, (by norm_num : Nat.Prime 13).squarefree, by norm_num,
+      List.cons_ne_nil _ _, pool4_block13_valid⟩
+  · exact ⟨by norm_num, (by norm_num : Nat.Prime 29).squarefree, by norm_num,
+      List.cons_ne_nil _ _, pool4_block29_valid⟩
+  · exact ⟨by norm_num, (by norm_num : Nat.Prime 37).squarefree, by norm_num,
+      List.cons_ne_nil _ _, pool4_block37_valid⟩
+  · exact ⟨by norm_num, squarefree_51, by norm_num,
+      List.cons_ne_nil _ _, pool4_block51_valid⟩
+  · exact ⟨by norm_num, (by norm_num : Nat.Prime 53).squarefree, by norm_num,
+      List.cons_ne_nil _ _, pool4_block53_valid⟩
+  · exact ⟨by norm_num, (by norm_num : Nat.Prime 61).squarefree, by norm_num,
+      List.cons_ne_nil _ _, pool4_block61_valid⟩
   · exact ⟨by norm_num, (by norm_num : Nat.Prime 101).squarefree, by norm_num,
-      pool4_block101_valid⟩
+      List.cons_ne_nil _ _, pool4_block101_valid⟩
   · exact ⟨by norm_num, (by norm_num : Nat.Prime 109).squarefree, by norm_num,
-      pool4_block109_valid⟩
+      List.cons_ne_nil _ _, pool4_block109_valid⟩
 
 /-- **`pool6` is a pool for `k = 6`.** Nine blocks on distinct primes, each modulus square-free
-because it is prime, each height at least `2`, and each support a ranked support of its stated
-height for sixth powers. -/
+because it is prime, each height at least `2`, and each support a nonempty ranked support of its
+stated height for sixth powers. -/
 theorem pool6_valid_internal : ValidPool 6 pool6 := by
   refine ⟨pool6_ne_nil, pool6_coprime, ?_⟩
   intro b hb
   simp only [pool6, List.mem_cons, List.not_mem_nil, or_false] at hb
   rcases hb with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · exact ⟨by norm_num, (by norm_num : Nat.Prime 7).squarefree, by norm_num, pool6_block7_valid⟩
-  · exact ⟨by norm_num, (by norm_num : Nat.Prime 19).squarefree, by norm_num, pool6_block19_valid⟩
-  · exact ⟨by norm_num, (by norm_num : Nat.Prime 31).squarefree, by norm_num, pool6_block31_valid⟩
-  · exact ⟨by norm_num, (by norm_num : Nat.Prime 43).squarefree, by norm_num, pool6_block43_valid⟩
-  · exact ⟨by norm_num, (by norm_num : Nat.Prime 67).squarefree, by norm_num, pool6_block67_valid⟩
-  · exact ⟨by norm_num, (by norm_num : Nat.Prime 79).squarefree, by norm_num, pool6_block79_valid⟩
+  · exact ⟨by norm_num, (by norm_num : Nat.Prime 7).squarefree, by norm_num,
+      List.cons_ne_nil _ _, pool6_block7_valid⟩
+  · exact ⟨by norm_num, (by norm_num : Nat.Prime 19).squarefree, by norm_num,
+      List.cons_ne_nil _ _, pool6_block19_valid⟩
+  · exact ⟨by norm_num, (by norm_num : Nat.Prime 31).squarefree, by norm_num,
+      List.cons_ne_nil _ _, pool6_block31_valid⟩
+  · exact ⟨by norm_num, (by norm_num : Nat.Prime 43).squarefree, by norm_num,
+      List.cons_ne_nil _ _, pool6_block43_valid⟩
+  · exact ⟨by norm_num, (by norm_num : Nat.Prime 67).squarefree, by norm_num,
+      List.cons_ne_nil _ _, pool6_block67_valid⟩
+  · exact ⟨by norm_num, (by norm_num : Nat.Prime 79).squarefree, by norm_num,
+      List.cons_ne_nil _ _, pool6_block79_valid⟩
   · exact ⟨by norm_num, (by norm_num : Nat.Prime 103).squarefree, by norm_num,
-      pool6_block103_valid⟩
+      List.cons_ne_nil _ _, pool6_block103_valid⟩
   · exact ⟨by norm_num, (by norm_num : Nat.Prime 127).squarefree, by norm_num,
-      pool6_block127_valid⟩
+      List.cons_ne_nil _ _, pool6_block127_valid⟩
   · exact ⟨by norm_num, (by norm_num : Nat.Prime 139).squarefree, by norm_num,
-      pool6_block139_valid⟩
+      List.cons_ne_nil _ _, pool6_block139_valid⟩
 
 end KthPower
