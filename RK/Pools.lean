@@ -3,24 +3,25 @@ import RK.Defs
 /-!
 # The two pools, verified block by block
 
-`pool4` and `pool6` are the concrete inputs to the directed construction: eight blocks on the
-primes `5, 13, 29, 37, 53, 61, 101, 109` for `k = 4`, and nine on `7, 19, 31, 43, 67, 79, 103,
-127, 139` for `k = 6`. This file proves that each is a pool in the sense of `ValidPool`, which is
-the only property of them the construction uses.
+`pool4` and `pool6` are the concrete inputs to the directed construction: nine blocks for `k = 4`,
+on the primes `5, 13, 29, 37, 53, 61, 101, 109` and on the composite modulus `51 = 3 · 17`, and
+nine for `k = 6`, on the primes `7, 19, 31, 43, 67, 79, 103, 127, 139`. This file proves that each
+is a pool in the sense of `ValidPool`, which is the only property of them the construction uses.
 
 `ValidPool k P` has four parts, and each is checked here in the way that suits it:
 
 * `P ≠ []` and the pairwise coprimality of the moduli are finite computations on the stored
   numerals, settled by `decide`;
 * `2 ≤ m` and `2 ≤ H` are arithmetic on numerals, settled by `norm_num`;
-* `Squarefree m` comes from primality: every modulus is prime, `norm_num` proves that, and a
-  prime is square-free. That is the cheap route — the decidability instance for `Squarefree` on
-  `ℕ` runs through `Nat.minSqFac`, a factoring search, whereas the primality of a three-digit
-  number is immediate;
+* `Squarefree m` comes from the factorisation of the modulus: seventeen of the eighteen moduli
+  are prime, `norm_num` proves that, and a prime is square-free; the remaining one is `51 = 3·17`,
+  square-free because it is a product of two coprime square-free numbers (`squarefree_51`). That
+  is the cheap route — the decidability instance for `Squarefree` on `ℕ` runs through
+  `Nat.minSqFac`, a factoring search, whereas the primality of a three-digit number is immediate;
 * `ValidRankedSupport k m sup H` — distinct vertices below `m`, ranks below `H`, and a strict
   rank drop along every arc — is one pass over the ordered pairs of the support, with the set of
   nonzero k-th-power residues mod `m` recomputed by a search over `z < m` for each pair. That is
-  what `decide` performs in the kernel, and it is done once per block, in the seventeen theorems
+  what `decide` performs in the kernel, and it is done once per block, in the eighteen theorems
   below, so that each block stands as a statement of its own.
 
 The blocks are lower-bound certificates. Nothing here claims that the heights are least possible
@@ -32,7 +33,7 @@ namespace KthPower
 
 set_option maxRecDepth 100000
 
-/-! ## The eight blocks of `pool4`
+/-! ## The nine blocks of `pool4`
 
 Each theorem below says: the listed `(vertex, rank)` pairs have distinct vertices below `m`, all
 ranks below `H`, and whenever the difference of two vertices is a nonzero fourth-power residue
@@ -59,6 +60,16 @@ theorem pool4_block37_valid :
     ValidRankedSupport 4 37
       [(0, 9), (3, 10), (5, 1), (8, 10), (10, 6), (13, 7), (15, 0), (18, 9), (20, 3), (23, 4),
         (26, 5), (32, 2), (34, 8)] 11 := by
+  decide
+
+/-- The block at the composite modulus `m = 51 = 3 · 17`, height `17`: seventeen vertices, the
+residue `0` together with the interval `35, …, 50` ranked in reverse. It is the one block of
+either pool whose modulus is not prime; square-freeness of the modulus, which is what the
+construction needs, is `squarefree_51` below. -/
+theorem pool4_block51_valid :
+    ValidRankedSupport 4 51
+      [(0, 0), (35, 16), (36, 15), (37, 14), (38, 13), (39, 12), (40, 11), (41, 10), (42, 9),
+        (43, 8), (44, 7), (45, 6), (46, 5), (47, 4), (48, 3), (49, 2), (50, 1)] 17 := by
   decide
 
 /-- The block at `m = 53`, height `8`: sixteen vertices. -/
@@ -117,12 +128,12 @@ theorem pool6_block43_valid :
         (22, 3), (23, 0), (25, 5), (26, 1), (31, 1), (36, 3), (37, 0), (40, 2)] 6 := by
   decide
 
-/-- The block at `m = 67`, height `15`: twenty-three vertices. -/
+/-- The block at `m = 67`, height `14`: twenty-three vertices. -/
 theorem pool6_block67_valid :
     ValidRankedSupport 6 67
-      [(0, 5), (2, 8), (4, 14), (5, 9), (6, 1), (10, 11), (11, 2), (14, 3), (16, 3), (18, 12),
-        (24, 4), (25, 1), (27, 7), (32, 10), (34, 0), (36, 0), (42, 6), (44, 13), (53, 12),
-        (55, 12), (63, 13), (64, 3), (65, 0)] 15 := by
+      [(0, 9), (1, 5), (2, 3), (4, 6), (8, 12), (10, 4), (14, 1), (17, 2), (20, 3), (26, 0),
+        (30, 10), (33, 11), (37, 13), (39, 0), (43, 11), (46, 12), (47, 8), (49, 13), (55, 9),
+        (56, 7), (58, 10), (59, 8), (65, 4)] 14 := by
   decide
 
 /-- The block at `m = 79`, height `17`: twenty-seven vertices. -/
@@ -142,32 +153,40 @@ theorem pool6_block103_valid :
         (95, 5)] 13 := by
   decide
 
-/-- The block at `m = 127`, height `13`: thirty-three vertices. -/
+/-- The block at `m = 127`, height `9`: thirty-three vertices. -/
 theorem pool6_block127_valid :
     ValidRankedSupport 6 127
-      [(0, 12), (2, 9), (6, 3), (9, 5), (19, 6), (21, 1), (24, 12), (26, 11), (28, 4), (32, 3),
-        (43, 10), (45, 1), (47, 0), (50, 11), (52, 8), (58, 10), (62, 9), (65, 10), (69, 4),
-        (71, 0), (81, 1), (84, 7), (86, 6), (88, 1), (91, 11), (93, 2), (98, 11), (99, 7),
-        (100, 0), (107, 0), (110, 10), (114, 7), (122, 2)] 13 := by
+      [(0, 4), (1, 1), (4, 0), (7, 5), (13, 2), (16, 1), (22, 1), (27, 7), (28, 2), (31, 1),
+        (40, 6), (43, 6), (44, 1), (49, 5), (55, 6), (57, 0), (64, 3), (67, 8), (70, 7), (71, 4),
+        (79, 3), (84, 6), (85, 2), (86, 0), (92, 0), (97, 8), (99, 4), (101, 0), (106, 7),
+        (112, 6), (113, 1), (114, 0), (119, 5)] 9 := by
   decide
 
-/-- The block at `m = 139`, height `29`: thirty-four vertices, the largest block in either pool
-and the largest of the seventeen kernel checks. -/
+/-- The block at `m = 139`, height `22`: thirty-four vertices, the largest block in either pool
+and the largest of the eighteen kernel checks. -/
 theorem pool6_block139_valid :
     ValidRankedSupport 6 139
-      [(0, 14), (6, 13), (7, 0), (18, 19), (24, 11), (25, 6), (27, 17), (31, 5), (33, 16),
-        (38, 25), (39, 15), (42, 0), (44, 2), (47, 23), (49, 28), (54, 18), (58, 7), (66, 20),
-        (67, 3), (74, 24), (79, 10), (85, 9), (91, 8), (93, 21), (96, 0), (104, 3), (110, 1),
-        (117, 17), (118, 12), (120, 26), (126, 22), (128, 27), (135, 1), (137, 4)] 29 := by
+      [(0, 16), (1, 11), (5, 19), (11, 12), (20, 1), (25, 14), (30, 2), (31, 0), (40, 12),
+        (41, 5), (43, 2), (45, 7), (46, 6), (48, 17), (50, 16), (55, 8), (57, 4), (60, 17),
+        (62, 18), (69, 9), (71, 18), (73, 21), (78, 9), (90, 5), (91, 3), (97, 0), (113, 6),
+        (115, 14), (116, 13), (117, 10), (118, 4), (128, 16), (129, 15), (138, 20)] 22 := by
   decide
 
 /-! ## The two pools
 
-`pool4.length = 8` and `pool6.length = 9` are stated because the number of blocks is part of how
+`pool4.length = 9` and `pool6.length = 9` are stated because the number of blocks is part of how
 the pools are described, and `rfl` settles it. -/
 
-/-- `pool4` has eight blocks. -/
-theorem pool4_length : pool4.length = 8 := rfl
+/-- `51 = 3 · 17` is square-free: a product of two coprime square-free numbers is square-free,
+and `3` and `17` are primes. It is the only modulus in either pool that is not itself prime. -/
+theorem squarefree_51 : Squarefree 51 := by
+  rw [show (51 : ℕ) = 3 * 17 by norm_num]
+  exact Nat.squarefree_mul_iff.mpr
+    ⟨by norm_num, (by norm_num : Nat.Prime 3).squarefree,
+      (by norm_num : Nat.Prime 17).squarefree⟩
+
+/-- `pool4` has nine blocks. -/
+theorem pool4_length : pool4.length = 9 := rfl
 
 /-- `pool6` has nine blocks. -/
 theorem pool6_length : pool6.length = 9 := rfl
@@ -178,24 +197,26 @@ theorem pool4_ne_nil : pool4 ≠ [] := by decide
 /-- `pool6` is nonempty. -/
 theorem pool6_ne_nil : pool6 ≠ [] := by decide
 
-/-- The eight moduli of `pool4` are pairwise coprime — they are distinct primes. -/
+/-- The nine moduli of `pool4` are pairwise coprime: eight distinct primes and `51 = 3 · 17`,
+neither of whose factors is among them. -/
 theorem pool4_coprime : (pool4.map Prod.fst).Pairwise Nat.Coprime := by decide
 
 /-- The nine moduli of `pool6` are pairwise coprime — they are distinct primes. -/
 theorem pool6_coprime : (pool6.map Prod.fst).Pairwise Nat.Coprime := by decide
 
-/-- **`pool4` is a pool for `k = 4`.** Eight blocks on distinct primes, each modulus square-free
-because it is prime, each height at least `2`, and each support a ranked support of its stated
-height for fourth powers. -/
+/-- **`pool4` is a pool for `k = 4`.** Nine blocks on pairwise coprime square-free moduli — eight
+primes and `51 = 3 · 17` — each height at least `2`, and each support a ranked support of its
+stated height for fourth powers. -/
 theorem pool4_valid_internal : ValidPool 4 pool4 := by
   refine ⟨pool4_ne_nil, pool4_coprime, ?_⟩
   intro b hb
   simp only [pool4, List.mem_cons, List.not_mem_nil, or_false] at hb
-  rcases hb with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+  rcases hb with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
   · exact ⟨by norm_num, (by norm_num : Nat.Prime 5).squarefree, by norm_num, pool4_block5_valid⟩
   · exact ⟨by norm_num, (by norm_num : Nat.Prime 13).squarefree, by norm_num, pool4_block13_valid⟩
   · exact ⟨by norm_num, (by norm_num : Nat.Prime 29).squarefree, by norm_num, pool4_block29_valid⟩
   · exact ⟨by norm_num, (by norm_num : Nat.Prime 37).squarefree, by norm_num, pool4_block37_valid⟩
+  · exact ⟨by norm_num, squarefree_51, by norm_num, pool4_block51_valid⟩
   · exact ⟨by norm_num, (by norm_num : Nat.Prime 53).squarefree, by norm_num, pool4_block53_valid⟩
   · exact ⟨by norm_num, (by norm_num : Nat.Prime 61).squarefree, by norm_num, pool4_block61_valid⟩
   · exact ⟨by norm_num, (by norm_num : Nat.Prime 101).squarefree, by norm_num,
