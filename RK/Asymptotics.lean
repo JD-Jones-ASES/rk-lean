@@ -5,8 +5,6 @@ import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Order.LiminfLimsup
 import Mathlib.Order.Filter.AtTopBot.Basic
 
-set_option linter.unusedVariables false
-
 /-!
 # The limit formula and the passage to all `N`
 
@@ -326,7 +324,16 @@ applied under the numerator's `List.map`, and it is the seam between the pinned 
 of `alpha` and the shape the construction produces. -/
 theorem alpha_eq_ratio (k : ℕ) (P : List PoolEntry) (hk : 1 ≤ k) (hP : ValidPool k P)
     (hne : ∀ b ∈ P, b.2.1 ≠ []) : alpha k P = alphaNum k P / alphaDen k P := by
-  sorry
+  have hnum : (P.map fun b =>
+        (((k : ℝ) - 1) * Real.log b.1 + Real.log b.2.1.length) / Real.log b.2.2).sum
+      = alphaNum k P := by
+    rw [alphaNum]
+    refine congrArg List.sum (List.map_congr_left ?_)
+    intro b hb
+    have hm : 1 ≤ b.1 := by have := (hP.2.2 b hb).1; omega
+    have ht : 1 ≤ b.2.1.length := baseBlocks_one_le_card k P hP hne b hb
+    rw [log_natPow_mul k b.1 b.2.1.length hk hm ht]
+  rw [alpha, hnum, alphaDen]
 
 /-- The denominator is at least `1`: every term of `Σ log m_i / log H_i` is nonnegative. -/
 theorem alphaDen_pos (k : ℕ) (P : List PoolEntry) (hP : ValidPool k P) :
@@ -435,7 +442,48 @@ theorem tendsto_stageExponent (k : ℕ) (P : List PoolEntry) (hk : 1 ≤ k)
     (hP : ValidPool k P) (hne : ∀ b ∈ P, b.2.1 ≠ []) :
     Filter.Tendsto (fun U : ℝ => stageExponent k P (alloc U)) Filter.atTop
       (nhds (alpha k P)) := by
-  sorry
+  have hshape : (fun U : ℝ => stageExponent k P (alloc U)) = fun U : ℝ =>
+      Real.log (stageCard k P (alloc U)) /
+        Real.log ((stageModulus k P (alloc U) : ℝ) * (stageHeight k P (alloc U) : ℝ)) := rfl
+  have hbig : (0 : ℝ) < bigLog P := bigLog_pos k P hP
+  have hloglen : (0 : ℝ) ≤ Real.log P.length := Real.log_natCast_nonneg _
+  have hk0 : (0 : ℝ) ≤ (k : ℝ) := Nat.cast_nonneg k
+  rw [hshape, alpha_eq_ratio k P hk hP hne]
+  refine tendsto_ratio_of_abs_sub_le (alphaNum k P) (alphaDen k P)
+    ((P.map fun b => Real.log ((b.1 ^ (k - 1) * b.2.1.length : ℕ))).sum)
+    ((k : ℝ) * (P.map fun b => Real.log (b.1 : ℝ)).sum + bigLog P + Real.log P.length)
+    (alphaDen_pos k P hP) _ _ ?_ ?_
+  · -- numerator: `log |C| = Σ e_i(U) log (m_i^{k-1} t_i) = U · alphaNum + O(1)`
+    filter_upwards [Filter.eventually_ge_atTop (0 : ℝ)] with U hU
+    have hmul : alphaNum k P * U =
+        U * (P.map fun b => Real.log ((b.1 ^ (k - 1) * b.2.1.length : ℕ))
+          / Real.log (b.2.2 : ℝ)).sum := by rw [alphaNum]; ring
+    rw [log_stageCard k P hP hne, hmul]
+    refine abs_alloc_weighted_sub_le k P hP U hU _ ?_
+    intro b hb
+    have h1 : 0 < b.1 := by have := (hP.2.2 b hb).1; omega
+    have h2 := baseBlocks_one_le_card k P hP hne b hb
+    have h3 : (1 : ℕ) ≤ b.1 ^ (k - 1) * b.2.1.length :=
+      Nat.mul_pos (pow_pos h1 _) (by omega)
+    exact Real.log_nonneg (by exact_mod_cast h3)
+  · -- denominator: `log P + log H = k U Σ log m_i/log H_i + U + O(1)`, the height's `O(1)`
+    -- being the sandwich and the modulus' the same weighted estimate at `w = log m_i`
+    filter_upwards [Filter.eventually_ge_atTop (bigLog P)] with U hU
+    have hU0 : (0 : ℝ) ≤ U := le_trans hbig.le hU
+    have hPm : ((stageModulus k P (alloc U) : ℕ) : ℝ) ≠ 0 := by
+      have := stageModulus_pos k P hP (alloc U); positivity
+    have hHt : ((stageHeight k P (alloc U) : ℕ) : ℝ) ≠ 0 := by
+      have := stageHeight_pos k P (alloc U); positivity
+    have hS := abs_alloc_weighted_sub_le k P hP U hU0 (fun b => Real.log (b.1 : ℝ))
+      (fun b _ => Real.log_natCast_nonneg _)
+    have hlow := mul_le_mul_of_nonneg_left (abs_le.mp hS).1 hk0
+    have hhigh := mul_le_mul_of_nonneg_left (abs_le.mp hS).2 hk0
+    have hLH1 := log_stageHeight_lower k P hP U hU
+    have hLH2 := log_stageHeight_upper k P hP U hU
+    rw [Real.log_mul hPm hHt, log_stageModulus k P hP, alphaDen, abs_le]
+    constructor
+    · nlinarith [hlow, hLH1, hloglen]
+    · nlinarith [hhigh, hLH2, hbig]
 
 /-- The corollary the passage consumes: below the exponent of the pool there is an honest
 finite stage, with every multiplicity positive and a stage size worth taking logarithms
@@ -583,16 +631,76 @@ theorem fixPool_sup_ne_nil (P : List PoolEntry) : ∀ b ∈ fixPool P, b.2.1 ≠
   · simp [h]
   · simp [h]
 
+/-- The support with the single vertex `0` at rank `0` is a ranked support modulo any
+positive `m` of any positive height: there is one vertex, so there is no ordered pair of
+distinct vertices and the rank-drop condition is vacuous. -/
+private theorem validRankedSupport_singleton (k m H : ℕ) (hm : 0 < m) (hH : 0 < H) :
+    ValidRankedSupport k m [(0, 0)] H := by
+  refine ⟨by simp, ?_, ?_⟩
+  · intro p hp
+    simp only [List.mem_singleton] at hp
+    subst hp
+    exact ⟨hm, hH⟩
+  · intro p hp q hq hpq
+    simp only [List.mem_singleton] at hp hq
+    subst hp
+    subst hq
+    exact absurd rfl hpq
+
 /-- The normalised pool is a pool: the moduli and heights are untouched, and the single
 vertex `0` at rank `0` is a ranked support modulo any `m ≥ 2` of any height `H ≥ 2`. -/
 theorem fixPool_valid (k : ℕ) (P : List PoolEntry) (hP : ValidPool k P) :
     ValidPool k (fixPool P) := by
-  sorry
+  have hfst : ∀ b : PoolEntry, (fixEntry b).1 = b.1 := by
+    intro b
+    unfold fixEntry
+    by_cases h : b.2.1 = [] <;> simp [h]
+  refine ⟨?_, ?_, ?_⟩
+  · simp only [fixPool, ne_eq, List.map_eq_nil_iff]
+    exact hP.1
+  · have hmap : (fixPool P).map Prod.fst = P.map Prod.fst := by
+      rw [fixPool, List.map_map]
+      exact List.map_congr_left fun b _ => hfst b
+    rw [hmap]
+    exact hP.2.1
+  · intro b hb
+    simp only [fixPool, List.mem_map] at hb
+    obtain ⟨c, hc, rfl⟩ := hb
+    obtain ⟨hm, hsf, hH, hV⟩ := hP.2.2 c hc
+    by_cases h : c.2.1 = []
+    · have he : fixEntry c = (c.1, [((0 : ℕ), (0 : ℕ))], c.2.2) := by simp [fixEntry, h]
+      rw [he]
+      exact ⟨hm, hsf, hH,
+        validRankedSupport_singleton k c.1 c.2.2 (by omega) (by omega)⟩
+    · have he : fixEntry c = c := by simp [fixEntry, h]
+      rw [he]
+      exact ⟨hm, hsf, hH, hV⟩
 
 /-- Normalising a pool does not change its exponent: the only quantity that moves is
 `log t` at a block with `t = 0`, and `Real.log 0 = 0 = Real.log 1`. -/
 theorem alpha_fixPool (k : ℕ) (P : List PoolEntry) : alpha k (fixPool P) = alpha k P := by
-  sorry
+  have key : ∀ F : PoolEntry → ℝ, (∀ b : PoolEntry, F (fixEntry b) = F b) →
+      ((fixPool P).map F).sum = (P.map F).sum := by
+    intro F hF
+    rw [fixPool, List.map_map]
+    exact congrArg List.sum (List.map_congr_left fun b _ => hF b)
+  have hnum := key (fun b =>
+    (((k : ℝ) - 1) * Real.log b.1 + Real.log b.2.1.length) / Real.log b.2.2) (by
+      intro b
+      by_cases h : b.2.1 = []
+      · have he : fixEntry b = (b.1, [((0 : ℕ), (0 : ℕ))], b.2.2) := by simp [fixEntry, h]
+        rw [he, h]
+        simp
+      · have he : fixEntry b = b := by simp [fixEntry, h]
+        rw [he])
+  have hden := key (fun b => Real.log b.1 / Real.log b.2.2) (by
+      intro b
+      by_cases h : b.2.1 = []
+      · have he : fixEntry b = (b.1, [((0 : ℕ), (0 : ℕ))], b.2.2) := by simp [fixEntry, h]
+        rw [he]
+      · have he : fixEntry b = b := by simp [fixEntry, h]
+        rw [he])
+  rw [alpha, alpha, hnum, hden]
 
 /-! ## The two general targets -/
 
