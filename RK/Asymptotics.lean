@@ -30,10 +30,10 @@ lemmas `log_stageHeight_lower` and `log_stageHeight_upper` are the whole content
 
 The constants are supplied by the pool itself rather than by numerals: `bigLog P` is the
 sum of the `log H_i`, which dominates each of them because every height is at least `2`,
-and `P.length` is the number of blocks. A pool with an empty support is normalised away by
-`fixPool` before the estimates run: replacing an empty support by the single vertex `0`
-changes neither the exponent (`log 0 = log 1 = 0`) nor the validity of the pool, and it is
-what lets the counting argument assume every block has a vertex to count.
+and `P.length` is the number of blocks. The nonemptiness of the supports is a hypothesis,
+not a normalisation: a pool requires every support to be nonempty, so every block has a
+vertex for the counting argument to count, and the degenerate case `t = 0` of the exponent
+formula — where `log 0 = log 1 = 0` — is unreachable.
 -/
 
 namespace KthPower
@@ -600,119 +600,26 @@ theorem stage_pointwise (k : ℕ) (P : List PoolEntry) (hk : 2 ≤ k) (hP : Vali
   rw [Nat.cast_mul]
   exact hρ
 
-/-- The pointwise bound for a pool with no empty support. -/
-theorem pointwise_of_ne_nil (k : ℕ) (P : List PoolEntry) (hk : 2 ≤ k) (hP : ValidPool k P)
-    (hne : ∀ b ∈ P, b.2.1 ≠ []) (ρ : ℝ) (hρ : ρ < alpha k P) :
-    ∀ᶠ N : ℕ in Filter.atTop, (N : ℝ) ^ ρ ≤ (D k N : ℝ) := by
-  obtain ⟨E, hE, hPH, hex⟩ := exists_stage_exponent_gt k P (by omega) hP hne ρ hρ
-  exact stage_pointwise k P hk hP hne E hE hPH ρ hex
-
-/-! ## Normalising a pool with an empty support
-
-`ValidPool` does not forbid an empty support list: the emptiness conditions of a ranked
-support are vacuous. Such a block contributes `log 0 = 0` to the numerator of the exponent,
-exactly as a one-vertex block contributes `log 1 = 0`, so replacing it by the block with
-the single vertex `0` at rank `0` changes neither the exponent nor the validity of the pool
-— and it is what lets the counting argument assume every block has a vertex. -/
-
-/-- A pool entry with an empty support replaced by the single vertex `0` at rank `0`. -/
-def fixEntry (b : PoolEntry) : PoolEntry :=
-  if b.2.1 = [] then (b.1, [(0, 0)], b.2.2) else b
-
-/-- A pool with every empty support replaced by a one-vertex support. -/
-def fixPool (P : List PoolEntry) : List PoolEntry := P.map fixEntry
-
-/-- The normalised pool has no empty support. -/
-theorem fixPool_sup_ne_nil (P : List PoolEntry) : ∀ b ∈ fixPool P, b.2.1 ≠ [] := by
-  intro b hb
-  obtain ⟨c, hc, rfl⟩ := List.mem_map.mp hb
-  unfold fixEntry
-  by_cases h : c.2.1 = []
-  · simp [h]
-  · simp [h]
-
-/-- The support with the single vertex `0` at rank `0` is a ranked support modulo any
-positive `m` of any positive height: there is one vertex, so there is no ordered pair of
-distinct vertices and the rank-drop condition is vacuous. -/
-private theorem validRankedSupport_singleton (k m H : ℕ) (hm : 0 < m) (hH : 0 < H) :
-    ValidRankedSupport k m [(0, 0)] H := by
-  refine ⟨by simp, ?_, ?_⟩
-  · intro p hp
-    simp only [List.mem_singleton] at hp
-    subst hp
-    exact ⟨hm, hH⟩
-  · intro p hp q hq hpq
-    simp only [List.mem_singleton] at hp hq
-    subst hp
-    subst hq
-    exact absurd rfl hpq
-
-/-- The normalised pool is a pool: the moduli and heights are untouched, and the single
-vertex `0` at rank `0` is a ranked support modulo any `m ≥ 2` of any height `H ≥ 2`. -/
-theorem fixPool_valid (k : ℕ) (P : List PoolEntry) (hP : ValidPool k P) :
-    ValidPool k (fixPool P) := by
-  have hfst : ∀ b : PoolEntry, (fixEntry b).1 = b.1 := by
-    intro b
-    unfold fixEntry
-    by_cases h : b.2.1 = [] <;> simp [h]
-  refine ⟨?_, ?_, ?_⟩
-  · simp only [fixPool, ne_eq, List.map_eq_nil_iff]
-    exact hP.1
-  · have hmap : (fixPool P).map Prod.fst = P.map Prod.fst := by
-      rw [fixPool, List.map_map]
-      exact List.map_congr_left fun b _ => hfst b
-    rw [hmap]
-    exact hP.2.1
-  · intro b hb
-    simp only [fixPool, List.mem_map] at hb
-    obtain ⟨c, hc, rfl⟩ := hb
-    obtain ⟨hm, hsf, hH, hV⟩ := hP.2.2 c hc
-    by_cases h : c.2.1 = []
-    · have he : fixEntry c = (c.1, [((0 : ℕ), (0 : ℕ))], c.2.2) := by simp [fixEntry, h]
-      rw [he]
-      exact ⟨hm, hsf, hH,
-        validRankedSupport_singleton k c.1 c.2.2 (by omega) (by omega)⟩
-    · have he : fixEntry c = c := by simp [fixEntry, h]
-      rw [he]
-      exact ⟨hm, hsf, hH, hV⟩
-
-/-- Normalising a pool does not change its exponent: the only quantity that moves is
-`log t` at a block with `t = 0`, and `Real.log 0 = 0 = Real.log 1`. -/
-theorem alpha_fixPool (k : ℕ) (P : List PoolEntry) : alpha k (fixPool P) = alpha k P := by
-  have key : ∀ F : PoolEntry → ℝ, (∀ b : PoolEntry, F (fixEntry b) = F b) →
-      ((fixPool P).map F).sum = (P.map F).sum := by
-    intro F hF
-    rw [fixPool, List.map_map]
-    exact congrArg List.sum (List.map_congr_left fun b _ => hF b)
-  have hnum := key (fun b =>
-    (((k : ℝ) - 1) * Real.log b.1 + Real.log b.2.1.length) / Real.log b.2.2) (by
-      intro b
-      by_cases h : b.2.1 = []
-      · have he : fixEntry b = (b.1, [((0 : ℕ), (0 : ℕ))], b.2.2) := by simp [fixEntry, h]
-        rw [he, h]
-        simp
-      · have he : fixEntry b = b := by simp [fixEntry, h]
-        rw [he])
-  have hden := key (fun b => Real.log b.1 / Real.log b.2.2) (by
-      intro b
-      by_cases h : b.2.1 = []
-      · have he : fixEntry b = (b.1, [((0 : ℕ), (0 : ℕ))], b.2.2) := by simp [fixEntry, h]
-        rw [he]
-      · have he : fixEntry b = b := by simp [fixEntry, h]
-        rw [he])
-  rw [alpha, alpha, hnum, hden]
+/-- Every support of a pool is nonempty: the fourth conjunct of `ValidPool`, read off the
+definition. It is what lets the counting argument assume that every block has a vertex to
+count, and with it the case `t = 0` of the exponent formula — where `log 0 = 0 = log 1` —
+never arises. -/
+theorem validPool_sup_ne_nil (k : ℕ) (P : List PoolEntry) (hP : ValidPool k P) :
+    ∀ b ∈ P, b.2.1 ≠ [] := fun b hb => (hP.2.2 b hb).2.2.2.1
 
 /-! ## The two general targets -/
 
 /-- **The directed construction at every `k`, pointwise form.** For `k ≥ 2`, every pool `P`
-for `k` and every `ρ < alpha k P`, `N ^ ρ ≤ D_k(N)` for all sufficiently large `N`. -/
+for `k` and every `ρ < alpha k P`, `N ^ ρ ≤ D_k(N)` for all sufficiently large `N`.
+
+A stage whose exponent exceeds `ρ` exists by the limit formula, and the passage carries its
+bound to every large `N`. -/
 theorem pointwise_internal (k : ℕ) (hk : 2 ≤ k) (P : List PoolEntry) (hP : ValidPool k P)
     (ρ : ℝ) (hρ : ρ < alpha k P) :
     ∀ᶠ N : ℕ in Filter.atTop, (N : ℝ) ^ ρ ≤ (D k N : ℝ) := by
-  refine pointwise_of_ne_nil k (fixPool P) hk (fixPool_valid k P hP)
-    (fixPool_sup_ne_nil P) ρ ?_
-  rw [alpha_fixPool k P]
-  exact hρ
+  have hne := validPool_sup_ne_nil k P hP
+  obtain ⟨E, hE, hPH, hex⟩ := exists_stage_exponent_gt k P (by omega) hP hne ρ hρ
+  exact stage_pointwise k P hk hP hne E hE hPH ρ hex
 
 /-- **The directed construction at every `k`, liminf form.** For `k ≥ 2` and every pool `P`
 for `k`, `alpha k P ≤ liminf log D_k(N) / log N`.
