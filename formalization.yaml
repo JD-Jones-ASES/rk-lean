@@ -1,0 +1,363 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "rk-lean: the directed construction for k-th-power-difference-free sets at every k, with the exponents 0.910358 (k = 4) and 0.950739 (k = 6)"
+  description: >-
+    A Lean 4 proof of Krachun's directed (acyclic-block) lower-bound construction for sets of
+    integers with no k-th-power difference, stated and proved for every exponent k >= 2. Let
+    D_k(N) be the largest size of a subset of {1,...,N} no two of whose elements differ by a
+    nonzero perfect k-th power. A pool for k is a nonempty list of blocks (m, sup, H) with
+    pairwise coprime square-free moduli m >= 2, heights H >= 2, and sup a list of
+    (vertex, rank) pairs with distinct vertices below m, ranks below H, and a strict rank drop
+    along every ordered pair of vertices whose difference is a nonzero k-th-power residue mod m
+    (so the induced digraph is acyclic). For every such pool,
+    alpha k P <= liminf log D_k(N)/log N, where
+    alpha k P = (sum ((k-1) log m + log t)/log H) / (1 + k sum log m / log H) and t is the number
+    of vertices of a block; and N^rho <= D_k(N) for all large N whenever rho < alpha k P. The
+    theorem is instantiated at k = 4 with eight blocks on the primes 5, 13, 29, 37, 53, 61, 101,
+    109 and at k = 6 with nine blocks on 7, 19, 31, 43, 67, 79, 103, 127, 139, giving the
+    exponents 0.910358021185... and 0.950738855746..., each proved to exceed the corresponding
+    Ruzsa transfer value ((3 + log 6/log 17)/4 = 0.908103119289... and
+    (5 + log 6/log 13)/6 = 0.949759249243..., the latter being Ruzsa's own published Corollary at
+    k = 6) and the decimal bounds 0.9103 and 0.9507, by exact comparisons of natural powers.
+  authors: ["JD Jones"]
+  responsible_maintainers: ["JD Jones"]
+  license: "MIT"
+
+classification:
+  arxiv: ["math.NT", "math.CO"]
+  msc2020: ["11B30", "11B75", "05C20"]
+
+sources:
+  - title: "Square-Difference-Free Sets beyond the Three-Quarter Barrier"
+    authors: ["Dmitry Krachun"]
+    id: "arXiv:2608.01325"
+    type: "article"
+    location: "https://arxiv.org/abs/2608.01325"
+    relationship: "formalizes"
+    author_endorsement: "not-contacted"
+    note: >-
+      v1, 2 Aug 2026; no journal reference as of 2026-09-12. His Definition 2 (Paley chain) and
+      Lemma 3 (a local ranked block) are the ranked block formalized here as
+      ValidRankedSupport / RankedBlock; his Lemma 4 (appending the rank as a high digit) and
+      Lemma 5 (gluing coprime moduli by the Chinese remainder theorem) are generalized from the
+      square to the k-th power and appear as lemmaB_pdf and lemmaC. The paper is k = 2
+      throughout: its text contains no occurrence of "power", "cube", "fourth", "k-th" or "kth".
+      His Theorem 1, the ten-pair optimisation giving 0.752796455875..., is a k = 2 statement and
+      is not formalized here. The reading of a block as an acyclic digraph carried with a
+      topological ranking is this development's reformulation and is not attributed to him.
+  - title: "Difference sets without squares"
+    authors: ["Imre Z. Ruzsa"]
+    id: "doi:10.1007/BF02454169"
+    type: "article"
+    location: "https://doi.org/10.1007/BF02454169"
+    relationship: "background"
+    author_endorsement: "not-contacted"
+    note: >-
+      Periodica Mathematica Hungarica 15 (1984), no. 3, 205-209. Theorem 2 is the residue
+      transfer for every k, D_k(x) >> m^{-1} x^{gamma(k,m)} with
+      gamma(k,m) = 1 - 1/k + log r_k(m)/(k log m); its Corollary, at the least prime
+      p = p(2k) congruent to 1 mod 2k, prints the instances d_3 >= 0.854858... and
+      d_5 >= 0.934237..., and evaluates at k = 4, 6 to 0.872325... (p = 17) and 0.949759...
+      (p = 13). The base-m digit method underlying Lemma A is his. Not formalized here: the
+      transfer itself is not a theorem of this repository, only the two real numbers the
+      exponents are compared against.
+  - title: "Lower bounds in the polynomial Szemerédi theorem"
+    authors: ["Khalid Younis"]
+    id: "arXiv:1908.06058"
+    type: "article"
+    location: "https://arxiv.org/abs/1908.06058"
+    relationship: "background"
+    author_endorsement: "not-contacted"
+    note: >-
+      v1, 16 Aug 2019; no journal reference listed as of 2026-09-12. His Theorem 1.4 (Ruzsa)
+      states the general-k transfer in the form gamma = (k-1+log_m|R|)/k used throughout the
+      documentation here, and his section 1 records Lewko's cube value. No numerical value for
+      k >= 4 appears there.
+  - title: "An improved lower bound related to the Furstenberg–Sárközy theorem"
+    authors: ["Mark Lewko"]
+    id: "doi:10.37236/4656"
+    type: "article"
+    location: "https://doi.org/10.37236/4656"
+    relationship: "background"
+    author_endorsement: "not-contacted"
+    note: >-
+      Electronic Journal of Combinatorics 22 (2015), no. 1, Paper P1.32. Theorem 3 is the k = 2
+      transfer value 0.733412... at m = 205 with 12 residues; Theorem 4 is the best published
+      exponent for cubes, 2/3 + log 14/(3 log 91) = 0.861681..., from 14 residues mod 91; Lemma 5
+      is Ruzsa's transfer in the gamma(k,m) form. The census pattern for k-th-power-difference-free
+      residue sets follows this paper. k = 3 is odd, where the directed method reduces to
+      independent sets, so this value is not improved here.
+  - title: "Square-Difference-Free Sets of Size Ω(n^0.7334...)"
+    authors: ["Richard Beigel", "William Gasarch"]
+    id: "arXiv:0804.4892"
+    type: "article"
+    location: "https://arxiv.org/abs/0804.4892"
+    relationship: "background"
+    author_endorsement: "not-contacted"
+    note: >-
+      The k = 2 transfer at m = 205 with 12 residues, 0.5(1 + log_205 12) = 0.733411797...; same
+      search pattern. The arXiv abstract mis-states the exponent as 0.7443...; the title and body
+      value is the correct one.
+  - title: "On the Shannon capacity of a graph"
+    authors: ["László Lovász"]
+    id: "doi:10.1109/TIT.1979.1055985"
+    type: "article"
+    location: "https://doi.org/10.1109/TIT.1979.1055985"
+    relationship: "background"
+    author_endorsement: "not-contacted"
+    note: >-
+      IEEE Transactions on Information Theory 25 (1979), no. 1, 1-7. The theta function bounding
+      the independence number of the Cayley graph of Z/p on the k-th powers, which caps every
+      independent-residue-set transfer at (k-1+c_k)/k. Cited in README.md as context only and
+      explicitly outside the formal development: Mathlib has no theta function and no theorem
+      here mentions it.
+  - title: "Difference sets without κ-th powers"
+    authors: ["Antal Balog", "József Pelikán", "János Pintz", "Endre Szemerédi"]
+    id: "doi:10.1007/BF01874311"
+    type: "article"
+    location: "https://doi.org/10.1007/BF01874311"
+    relationship: "background"
+    author_endorsement: "not-contacted"
+    note: >-
+      Acta Mathematica Hungarica 65 (1994), no. 2, 165-187. The upper-bound side at general fixed
+      k, extending Pintz-Steiger-Szemerédi; the best known general-degree bound is Rice's maximal
+      extension (Acta Arith. 187 (2019), 1-41, doi:10.4064/aa170828-26-8). Not formalized here.
+  - title: "New bounds for the Furstenberg–Sárközy theorem"
+    authors: ["Ben Green", "Mehtaab Sawhney"]
+    id: "arXiv:2411.17448"
+    type: "article"
+    location: "https://arxiv.org/abs/2411.17448"
+    relationship: "background"
+    author_endorsement: "not-contacted"
+    note: >-
+      v2, 10 Jan 2025. The best known upper bound at k = 2, |A| << N exp(-c sqrt(log N)); the
+      other side of the problem, not formalized here. Several secondary sources render the title
+      as "Improved bounds..."; the arXiv listing title is "New bounds...".
+  - title: "fs-formal: a Lean formalization for the Furstenberg–Sárközy problem, exponent 0.7537 < alphaInf"
+    authors: ["JD Jones"]
+    id: "PALOMAR-2026-08-26-000004"
+    type: "formalization"
+    relationship: "prior-work"
+    author_endorsement: "self"
+    note: >-
+      Registered 2026-08-26. The k = 2 case of the same construction: an eleven-block pool and
+      the exponent 0.7537415..., proved to exceed Krachun's 0.752796455875.... This repository is
+      the general-k development on that architecture; the k = 2 pool of that entry is a valid
+      pool of the theorem proved here, and no k = 2 statement is re-derived.
+  - title: "ry-lean: sets avoiding {x, x+y, x+y²} — Younis's two-set construction and the exponent 0.77028"
+    authors: ["JD Jones"]
+    id: "PALOMAR-2026-09-11-000003"
+    type: "formalization"
+    relationship: "prior-work"
+    author_endorsement: "self"
+    note: >-
+      Registered 2026-09-11. A different configuration (nonlinear Roth, not k-th-power
+      differences); cited as prior art in this problem area and as the pattern for the
+      one-repository registry layout, the axiom audit and the source guard used here.
+
+status:
+  scope: >-
+    Ten compared declarations over nine compared definitions. directed_liminf and
+    directed_pointwise are the general theorem: for every k >= 2 and every pool for k (a nonempty
+    list of blocks on pairwise coprime square-free moduli with a ranking strictly decreasing along
+    every k-th-power-residue arc), alpha k P <= liminf log D_k(N)/log N, and N^rho <= D_k(N)
+    eventually for every rho < alpha k P. pool4_valid and pool6_valid are the finite verifications
+    of the two concrete pools. alpha4_gt_transfer, alpha4_gt, alpha6_gt_transfer and alpha6_gt are
+    inequalities between real numbers defined by logarithms. fourth_power_liminf and
+    sixth_power_liminf are the general theorem applied to the two pools. Nothing is claimed about
+    upper bounds, about maximality of the supports or minimality of the heights, about optimality
+    of the pools, or about the theta ceiling discussed as context in README.md. The intentional
+    placeholders of Challenge.lean are excluded from proof counts; Solution.lean does not import
+    Challenge.lean.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+  main_results:
+    - declaration: "KthPower.directed_liminf"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "KthPower.directed_pointwise"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "KthPower.pool4_valid"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "KthPower.pool6_valid"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "KthPower.alpha4_gt_transfer"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "KthPower.alpha4_gt"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "KthPower.alpha6_gt_transfer"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "KthPower.alpha6_gt"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "KthPower.fourth_power_liminf"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "KthPower.sixth_power_liminf"
+      file: "Solution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+
+automation:
+  methods:
+    - method: "agent"
+      models: ["Claude Fable 5.1 (Anthropic)", "Claude Opus (Anthropic)"]
+      framework: "Claude Code with parallel subagents"
+      tool_setup: >-
+        Claude Fable 5.1 planned the formalization, wrote the statements of Challenge.lean and the
+        module architecture, and assembled the result; Claude Opus subagents wrote the Lean modules
+        in parallel, searched the literature and the formalization registries, wrote the
+        documentation, and audited the outcome for statement fidelity, axioms and documentation
+        accuracy. Lean 4.33.0 and Mathlib v4.33.0 (commit db584cd6) are pinned and lake update is
+        never run. The seventeen block verifications and the thirty-six rational bounds on ratios
+        of logarithms are ordinary decide, i.e. kernel arithmetic on natural-number literals;
+        there is no decide +kernel and no native_decide in the repository. The blocks were found by
+        a CP-SAT and tabu search on one desktop machine on 2026-09-12; the solver is not in the
+        trust chain, since every block is re-verified in the Lean kernel by decide and again by a
+        standard-library Python checker that reads nothing from the Lean sources.
+      prompting_notes: >-
+        The human operator selected the problem, required the theorem to be stated for a general
+        exponent k with no parity condition, required exact (non-numerical) proofs of the exponent
+        inequalities, required statement types free of instance diamonds, and required
+        self-contained documentation with a dated prior-art statement.
+  spend_usd: "not tracked"
+  notes: "See DISCLOSURE.md. Prompt, token and monetary accounting was not retained."
+
+fidelity:
+  divergences: >-
+    The compared theorem is stated for every k >= 2 with no parity condition, where the source is
+    k = 2 throughout. The additive formulation of k-th-power-difference-freeness
+    (a + z^k not in A for z > 0) covers both signs of a difference, so Lemma B needs no odd-k
+    branch; at odd k, however, -1 = (-1)^k is a k-th-power residue, the arc relation is symmetric,
+    every valid block is an independent set, and the theorem is then weaker than Ruzsa's transfer.
+    The general theorem is therefore of interest at even k, and the two instances are at k = 4 and
+    k = 6. Acyclicity of a block is not stated as a hypothesis: the ranking, which is an explicit
+    part of the data, is equivalent to it, and a strictly decreasing ranking is what the proofs
+    consume. The set of nonzero k-th-power residues is the full image of z -> z^k with 0 removed,
+    non-units included; restricting to units would make the lift false. Sets of integers are
+    Finset ℕ and residues are natural numbers below the modulus, so that every finite claim stays
+    decidable; D k N is a supremum of Finset.card over the k-th-power-difference-free subsets of
+    Finset.Icc 1 N, and no range is stated as an interval in ℤ (instance diamonds are avoided by
+    stating ranges as bounds). ValidPool admits a block with an empty support, which the proof
+    normalises away internally without changing the exponent. The general theorem at k >= 3 is new
+    to this development — Krachun states k = 2 — and the two pools, hence the two exponents at
+    k = 4 and k = 6, are new data appearing in no source.
+
+review:
+  status: "self-assessed"
+  notes: >-
+    No independent human expert review and no source-author endorsement is recorded. AI agents
+    developed and cross-reviewed the proof; the statements were reviewed against the source text
+    for dropped hypotheses and junk values, and against the prior-art report for every numerical
+    comparison. VERIFICATION.md records the mechanical checks completed at this snapshot and
+    states explicitly what is not checked (maximality of supports, minimality of heights,
+    optimality of the pools, the two residue sets behind the transfer values, the theta ceiling,
+    and the prior-art searches). Mechanical correctness and statement agreement do not establish
+    priority, significance, or the correctness of any informal interpretation.
+
+alignment:
+  namespace: "KthPower"
+  statements:
+    - source: "Krachun, arXiv:2608.01325, Lemmas 3-5 and the construction behind Theorem 1, with the square replaced by a k-th power for general k >= 2"
+      lean: "KthPower.directed_liminf"
+      module: "Solution"
+      status: "proved"
+      note: >-
+        Hypotheses: k >= 2 and ValidPool k P (nonempty list of blocks (m, sup, H); moduli pairwise
+        coprime, each m >= 2 square-free; each H >= 2; each sup a list of (vertex, rank) pairs with
+        distinct vertices below m, ranks below H, and rank(y) < rank(x) whenever the residue of
+        y - x is a nonzero k-th-power residue mod m). Conclusion:
+        alpha k P <= liminf log (D k N) / log N along atTop. Generalizes the source from k = 2; the
+        general statement appears in no source.
+    - source: "Krachun, arXiv:2608.01325, same construction, pointwise form; generalized to every k >= 2"
+      lean: "KthPower.directed_pointwise"
+      module: "Solution"
+      status: "proved"
+      note: >-
+        Same hypotheses, plus rho < alpha k P. Conclusion: (N : ℝ)^rho <= D k N for all
+        sufficiently large N (eventually along atTop), which is the >>_P N^{alpha - eps} form of
+        the source.
+    - source: "Not in any source: new instances. Eight blocks on the primes 5, 13, 29, 37, 53, 61, 101, 109, all congruent to 5 mod 8"
+      lean: "KthPower.pool4_valid"
+      module: "Solution"
+      status: "proved"
+      note: "ValidPool 4 pool4, by decide on each of the eight blocks plus coprimality and primality of the moduli."
+    - source: "Not in any source: new instances. Nine blocks on the primes 7, 19, 31, 43, 67, 79, 103, 127, 139, all congruent to 7 mod 12"
+      lean: "KthPower.pool6_valid"
+      module: "Solution"
+      status: "proved"
+      note: "ValidPool 6 pool6, by decide on each of the nine blocks plus coprimality and primality of the moduli."
+    - source: "Comparison with the Ruzsa transfer value at k = 4 from six fourth-power-difference-free residues mod 17 (Ruzsa, doi:10.1007/BF02454169, Theorem 2; the six-element set mod 17 is exhibited in README.md and appears in no publication found)"
+      lean: "KthPower.alpha4_gt_transfer"
+      module: "Solution"
+      status: "proved"
+      note: >-
+        (3 + log 6 / log 17) / 4 < alpha 4 pool4, i.e. 0.908103119289... < 0.910358021185...,
+        proved from eight rational lower bounds, eight rational upper bounds and the bound
+        log 6 / log 17 < 117/185, each a comparison of natural powers discharged by decide. The
+        only published k = 4 value is Ruzsa's own Corollary 0.872325271059..., which is lower; the
+        0.908103... rung is unpublished and this repository's own computation.
+    - source: "Not in any source: decimal bound"
+      lean: "KthPower.alpha4_gt"
+      module: "Solution"
+      status: "proved"
+      note: "0.9103 < alpha 4 pool4; the rational assembly proves 0.910334755826... < alpha 4 pool4."
+    - source: "Comparison with Ruzsa's own published Corollary at k = 6, p(12) = 13 (Ruzsa, doi:10.1007/BF02454169; the value 0.949759... is his, though he printed only the k = 3 and k = 5 instances)"
+      lean: "KthPower.alpha6_gt_transfer"
+      module: "Solution"
+      status: "proved"
+      note: >-
+        (5 + log 6 / log 13) / 6 < alpha 6 pool6, i.e. 0.949759249243... < 0.950738855746...,
+        proved from nine rational lower bounds, nine rational upper bounds and the bound
+        log 6 / log 13 < 146/209, each a comparison of natural powers discharged by decide.
+    - source: "Not in any source: decimal bound"
+      lean: "KthPower.alpha6_gt"
+      module: "Solution"
+      status: "proved"
+      note: "0.9507 < alpha 6 pool6; the rational assembly proves 0.950714529770... < alpha 6 pool6."
+    - source: "Not in any source: the general theorem at the new k = 4 pool"
+      lean: "KthPower.fourth_power_liminf"
+      module: "Solution"
+      status: "proved"
+      note: "alpha 4 pool4 <= liminf log (D 4 N) / log N; directed_liminf applied to pool4_valid."
+    - source: "Not in any source: the general theorem at the new k = 6 pool"
+      lean: "KthPower.sixth_power_liminf"
+      module: "Solution"
+      status: "proved"
+      note: "alpha 6 pool6 <= liminf log (D 6 N) / log N; directed_liminf applied to pool6_valid."
+
+acknowledgements: >-
+  Dmitry Krachun for the directed construction with a ranking; Imre Ruzsa for the digit method and
+  the transfer that covers every k; Khalid Younis for the form in which the transfer is quoted
+  here; Mark Lewko, Richard Beigel and William Gasarch for the residue-set searches this one
+  follows; László Lovász for the theta function used as context in README.md; Lean, Mathlib,
+  Comparator, lean4export, NanoDa, and the Palomar policy and verifier projects. AI assistance is
+  disclosed above and in DISCLOSURE.md.
