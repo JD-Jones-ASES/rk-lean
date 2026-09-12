@@ -137,24 +137,24 @@ theorem baseBlocks_rankedBlock (k : ℕ) (P : List PoolEntry) (hP : ValidPool k 
     ∀ c ∈ baseBlocks P, RankedBlock k c.1 c.2.1 c.2.2.1 c.2.2.2 := by
   intro c hc
   obtain ⟨b, hb, rfl⟩ := List.mem_map.mp hc
-  exact RankedBlock.of_validRankedSupport k b.1 b.2.2 b.2.1 (hP.2.2 b hb).2.2.2
+  exact RankedBlock.of_validRankedSupport k b.1 b.2.2 b.2.1 (hP.2.2 b hb).2.2.2.2
 
 /-- Every support consists of residues — the size count's hypothesis. -/
 theorem baseBlocks_support_lt (k : ℕ) (P : List PoolEntry) (hP : ValidPool k P) :
     ∀ c ∈ baseBlocks P, ∀ s ∈ c.2.1, s < c.1 := by
   intro c hc
   obtain ⟨b, hb, rfl⟩ := List.mem_map.mp hc
-  exact supportFinset_lt_of_valid k b.1 b.2.2 b.2.1 (hP.2.2 b hb).2.2.2
+  exact supportFinset_lt_of_valid k b.1 b.2.2 b.2.1 (hP.2.2 b hb).2.2.2.2
 
 /-- The number of vertices of a block is the length of its support list: the `t` of the
 exponent formula. -/
 theorem baseBlocks_card (k : ℕ) (P : List PoolEntry) (hP : ValidPool k P) :
     ∀ b ∈ P, (supportFinset b.2.1).card = b.2.1.length := by
   intro b hb
-  exact supportFinset_card b.2.1 (hP.2.2 b hb).2.2.2.1
+  exact supportFinset_card b.2.1 (hP.2.2 b hb).2.2.2.2.1
 
-/-- With no empty support, every block has at least one vertex. Together with `2 ≤ m` and
-`2 ≤ k` this is what makes each factor of `stageCard` exceed `1`. -/
+/-- Every block has at least one vertex: a pool's supports are nonempty. Together with
+`2 ≤ m` and `2 ≤ k` this is what makes each factor of `stageCard` exceed `1`. -/
 theorem baseBlocks_one_le_card (k : ℕ) (P : List PoolEntry) (hP : ValidPool k P)
     (hne : ∀ b ∈ P, b.2.1 ≠ []) : ∀ b ∈ P, 1 ≤ b.2.1.length := by
   intro b hb
@@ -171,7 +171,7 @@ theorem stageBlocks_rankedBlock (k : ℕ) (P : List PoolEntry) (hk : 1 ≤ k)
     ∀ c ∈ stageBlocks k P E, RankedBlock k c.1 c.2.1 c.2.2.1 c.2.2.2 := by
   intro c hc
   obtain ⟨b, hb, rfl⟩ := List.mem_map.mp hc
-  obtain ⟨hm, hsf, hH, hv⟩ := hP.2.2 b hb
+  obtain ⟨hm, hsf, hH, hnb, hv⟩ := hP.2.2 b hb
   exact lemmaA k b.1 hk hm hsf (supportFinset b.2.1) (rankOf b.2.1) b.2.2
     (RankedBlock.of_validRankedSupport k b.1 b.2.2 b.2.1 hv) (E b) (hE b hb)
 
@@ -218,7 +218,7 @@ theorem glue_card (k : ℕ) (P : List PoolEntry) (hk : 1 ≤ k) (hP : ValidPool 
   rw [glueList_card _ (stageBlocks_coprime k P hP E) (stageBlocks_support_lt k P E),
     stageBlocks, stageCard, List.map_map]
   refine congrArg List.prod (List.map_congr_left fun b hb => ?_)
-  have hv := (hP.2.2 b hb).2.2.2
+  have hv := (hP.2.2 b hb).2.2.2.2
   show (liftBlock k b.1 (E b) (supportFinset b.2.1)).card
       = (b.1 ^ (k - 1) * b.2.1.length) ^ E b
   rw [liftBlock_card k b.1 (E b) (supportFinset b.2.1) hk
