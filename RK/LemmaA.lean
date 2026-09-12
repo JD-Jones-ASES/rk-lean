@@ -414,7 +414,22 @@ theorem step2_uncapped (k m e d z lam q : ℕ) (hk : 1 ≤ k) (hm : 2 ≤ m) (hs
     (hq : q.Prime) (hqm : q ∣ m) (hd : d ≠ 0) (hz : z ≠ 0)
     (hlam : z ^ k = d + lam * m ^ (k * e)) (hunc : padicValNat q z < e) :
     padicValNat q d = k * padicValNat q z := by
-  sorry
+  have : Fact q.Prime := ⟨hq⟩
+  have hzk : z ^ k ≠ 0 := pow_ne_zero k hz
+  have hval : padicValNat q (z ^ k) = k * padicValNat q z := padicValNat.pow z k
+  have h1 : q ^ (k * padicValNat q z) ∣ z ^ k := by
+    rw [← hval]; exact pow_padicValNat_dvd
+  have h2 : ¬ q ^ (k * padicValNat q z + 1) ∣ z ^ k := by
+    rw [← hval]; exact pow_succ_padicValNat_not_dvd hzk
+  -- one further factor still fits below the cap: `k v_q(z) + 1 ≤ k (v_q(z) + 1) ≤ k e`
+  have hexp : k * (padicValNat q z + 1) = k * padicValNat q z + k := by ring
+  have hle : k * (padicValNat q z + 1) ≤ k * e := Nat.mul_le_mul_left k (by omega)
+  have hstep : k * padicValNat q z + 1 ≤ k * e := by omega
+  have hB : q ^ (k * padicValNat q z + 1) ∣ lam * m ^ (k * e) :=
+    (pow_dvd_pow q hstep).trans ((pow_dvd_pow_of_dvd hqm (k * e)).mul_left lam)
+  rw [hlam] at h1 h2
+  obtain ⟨h4, h5⟩ := exact_dvd_of_add hB h1 h2
+  exact padicValNat_eq_of_exact hq hd h4 h5
 
 /-- **Step 2, capped coordinate.** When `v_q(z) ≥ e`, both terms are divisible by
 `q ^ (k e)`, so `v_q(d) ≥ k e` and the coordinate carries no information about `k ∣ r` —
@@ -423,7 +438,15 @@ theorem step2_capped (k m e d z lam q : ℕ) (hk : 1 ≤ k) (hm : 2 ≤ m) (hsf 
     (hq : q.Prime) (hqm : q ∣ m) (hd : d ≠ 0) (hz : z ≠ 0)
     (hlam : z ^ k = d + lam * m ^ (k * e)) (hcap : e ≤ padicValNat q z) :
     k * e ≤ padicValNat q d := by
-  sorry
+  have : Fact q.Prime := ⟨hq⟩
+  have hzk : z ^ k ≠ 0 := pow_ne_zero k hz
+  have hval : padicValNat q (z ^ k) = k * padicValNat q z := padicValNat.pow z k
+  have hge : k * e ≤ padicValNat q (z ^ k) := by
+    rw [hval]; exact Nat.mul_le_mul_left k hcap
+  have h1 : q ^ (k * e) ∣ z ^ k := (padicValNat_dvd_iff_le hzk).mpr hge
+  have hB : q ^ (k * e) ∣ lam * m ^ (k * e) := (pow_dvd_pow_of_dvd hqm (k * e)).mul_left lam
+  rw [hlam] at h1
+  exact (padicValNat_dvd_iff_le hd).mp ((Nat.dvd_add_right hB).mp (by rwa [Nat.add_comm] at h1))
 
 /-- **Step 2 (headline).** `r = v_m(d)` is a minimum of multiples of `k`, hence a multiple
 of `k`. This is where square-freeness is essential: for `m = 9` and `k = 2`, `d = 9` has
@@ -433,7 +456,12 @@ theorem step2_dvd (k m e d z lam r : ℕ) (hk : 1 ≤ k) (hm : 2 ≤ m) (hsf : S
     (hlam : z ^ k = d + lam * m ^ (k * e))
     (hr : r < k * e) (h1 : m ^ r ∣ d) (h2 : ¬ m ^ (r + 1) ∣ d) :
     k ∣ r := by
-  sorry
+  obtain ⟨q, hq, hqm, hqv⟩ := exists_padicValNat_eq m d r hm hsf hd h1 h2
+  rcases Nat.lt_or_ge (padicValNat q z) e with hunc | hcap
+  · have hu := step2_uncapped k m e d z lam q hk hm hsf hq hqm hd hz hlam hunc
+    exact ⟨padicValNat q z, by omega⟩
+  · have hc := step2_capped k m e d z lam q hk hm hsf hq hqm hd hz hlam hcap
+    exfalso; omega
 
 /-! ## Step 3 — global divisibility -/
 
@@ -445,7 +473,13 @@ theorem step3_pow_dvd (k m e j d z lam : ℕ) (hk : 1 ≤ k) (hm : 2 ≤ m) (hsf
     (hlam : z ^ k = d + lam * m ^ (k * e)) (hj : j < e)
     (h1 : m ^ (k * j) ∣ d) (h2 : ¬ m ^ (k * j + 1) ∣ d) :
     m ^ j ∣ z := by
-  sorry
+  refine (pow_dvd_iff_forall_prime m z j hm hsf hz).mpr fun q hq hqm => ?_
+  rcases Nat.lt_or_ge (padicValNat q z) e with hunc | hcap
+  · have hv := step2_uncapped k m e d z lam q hk hm hsf hq hqm hd hz hlam hunc
+    have hge := (pow_dvd_iff_forall_prime m d (k * j) hm hsf hd).mp h1 q hq hqm
+    have hkj : k * j ≤ k * padicValNat q z := by omega
+    exact Nat.le_of_mul_le_mul_left hkj (by omega)
+  · omega
 
 /-! ## Step 4 — the leading digit is a nonzero k-th-power residue mod `m` -/
 
@@ -459,7 +493,33 @@ theorem step4_leading_power (k m e j d z lam u : ℕ) (hk : 1 ≤ k) (hm : 2 ≤
     (hlam : z ^ k = d + lam * m ^ (k * e)) (hj : j < e)
     (h1 : m ^ (k * j) ∣ d) (h2 : ¬ m ^ (k * j + 1) ∣ d) (hu : z = m ^ j * u) :
     IsNonzeroPowerMod k m (digit m (k * j) d) := by
-  sorry
+  have hm0 : 0 < m := by omega
+  have hp : 0 < m ^ (k * j) := Nat.pow_pos hm0
+  -- the constrained positions are `k` apart, so there is at least one full factor of `m`
+  -- above position `k j`: `k j + k ≤ k e`
+  have hexp : k * (j + 1) = k * j + k := by ring
+  have hle : k * (j + 1) ≤ k * e := Nat.mul_le_mul_left k (by omega)
+  have hgap : k * j + k ≤ k * e := by omega
+  obtain ⟨d', hd'⟩ := h1
+  have hdig : digit m (k * j) d = d' % m := by
+    rw [digit, hd', Nat.mul_div_cancel_left _ hp]
+  have hzk : z ^ k = m ^ (k * j) * u ^ k := by
+    rw [hu, mul_pow, ← pow_mul, Nat.mul_comm j k]
+  have hsplit : m ^ (k * e) = m ^ (k * j) * m ^ (k * e - k * j) := by
+    rw [← pow_add]; congr 1; omega
+  have hkey : m ^ (k * j) * u ^ k = m ^ (k * j) * (d' + lam * m ^ (k * e - k * j)) := by
+    rw [← hzk, hlam, hd', hsplit]; ring
+  have huk : u ^ k = d' + lam * m ^ (k * e - k * j) := Nat.eq_of_mul_eq_mul_left hp hkey
+  obtain ⟨c, hc⟩ : m ∣ m ^ (k * e - k * j) := dvd_pow_self m (by omega)
+  have hrw : lam * (m * c) = m * (lam * c) := by ring
+  have hmod : u ^ k % m = d' % m := by
+    rw [huk, hc, hrw, Nat.add_mul_mod_self_left]
+  refine ⟨?_, u % m, Nat.mod_lt _ hm0, ?_⟩
+  · rw [hdig, Nat.mod_mod_of_dvd _ dvd_rfl]
+    intro hzero
+    obtain ⟨c₂, hc₂⟩ : m ∣ d' := Nat.dvd_of_mod_eq_zero hzero
+    exact h2 ⟨c₂, by rw [hd', hc₂, pow_succ]; ring⟩
+  · rw [hdig, Nat.mod_mod_of_dvd _ dvd_rfl, ← Nat.pow_mod, hmod]
 
 /-! ## Step 5 — the rank drop -/
 
@@ -492,7 +552,42 @@ theorem lemmaA (k m : ℕ) (hk : 1 ≤ k) (hm : 2 ≤ m) (hsf : Squarefree m)
     (S : Finset ℕ) (h₀ : ℕ → ℕ) (H₀ : ℕ)
     (hS : RankedBlock k m S h₀ H₀) (e : ℕ) (he : 1 ≤ e) :
     RankedBlock k (m ^ (k * e)) (liftBlock k m e S) (liftRank k m e H₀ h₀) (H₀ ^ e) := by
-  sorry
+  obtain ⟨-, hSbd, hSarc⟩ := hS
+  have hm0 : 0 < m := by omega
+  have hMpos : 0 < m ^ (k * e) := Nat.pow_pos hm0
+  have hmem : ∀ x ∈ liftBlock k m e S, x < m ^ (k * e) ∧ ∀ i < e, digit m (k * i) x ∈ S :=
+    fun x hx => (mem_liftBlock k m e S x).mp hx
+  have hHpos : ∀ x ∈ liftBlock k m e S, 0 < H₀ := fun x hx =>
+    lt_of_le_of_lt (Nat.zero_le _) (hSbd _ ((hmem x hx).2 0 (by omega)))
+  refine ⟨fun x hx => (hmem x hx).1, fun x hx => ?_, ?_⟩
+  · exact liftRank_lt_pow k m e H₀ h₀ x (hHpos x hx) fun i hi => hSbd _ ((hmem x hx).2 i hi)
+  · intro x hx y hy hxy hpow
+    obtain ⟨hxlt, hxS⟩ := hmem x hx
+    obtain ⟨hylt, hyS⟩ := hmem y hy
+    have hdlt : diffMod (m ^ (k * e)) x y < m ^ (k * e) := diffMod_lt _ x y hMpos
+    have hd0 : diffMod (m ^ (k * e)) x y ≠ 0 := diffMod_ne_zero _ x y hxlt hylt hxy
+    obtain ⟨-, z, lam, hz0, -, hlam⟩ :=
+      exists_lambda_of_isNonzeroPowerMod k (m ^ (k * e)) _ hk hMpos hdlt hpow
+    obtain ⟨r, hrlt, hrne, hrlow⟩ := exists_least_digit_ne k m e x y hm hxlt hylt hxy
+    obtain ⟨hdvd1, hdvd2⟩ := step0_exact_dvd k m e x y r hk hm he hxlt hylt hrlt hrne hrlow
+    obtain ⟨j, hj⟩ :=
+      step2_dvd k m e _ z lam r hk hm hsf he hd0 hdlt hz0 hlam hrlt hdvd1 hdvd2
+    subst hj
+    have hjlt : j < e := by
+      by_contra hcon
+      have hcmp : k * e ≤ k * j := Nat.mul_le_mul_left k (by omega)
+      omega
+    obtain ⟨u, hu⟩ :=
+      step3_pow_dvd k m e j _ z lam hk hm hsf he hd0 hdlt hz0 hlam hjlt hdvd1 hdvd2
+    have hpow0 : IsNonzeroPowerMod k m (digit m (k * j) (diffMod (m ^ (k * e)) x y)) :=
+      step4_leading_power k m e j _ z lam u hk hm hsf he hd0 hdlt hz0 hlam hjlt hdvd1 hdvd2 hu
+    rw [step1_leading_digit k m e x y (k * j) hk hm he hxlt hylt hrlt hrlow] at hpow0
+    refine step5_rank_drop k m e H₀ j h₀ S x y (hHpos x hx) hjlt hxS hyS hSbd
+      (fun i hi => hrlow (k * i) ?_)
+      (hSarc _ (hxS j hjlt) _ (hyS j hjlt) hrne hpow0)
+    have hexp : k * (i + 1) = k * i + k := by ring
+    have hcmp : k * (i + 1) ≤ k * j := Nat.mul_le_mul_left k (by omega)
+    omega
 
 /-! ## The size count -/
 
@@ -511,7 +606,25 @@ of one level less on `x / m ^ k`. This is the recursion `liftBlock_card` runs on
 private theorem mem_liftBlock_succ (k m e : ℕ) (S : Finset ℕ) (hk : 1 ≤ k) (hm : 0 < m)
     (x : ℕ) :
     x ∈ liftBlock k m (e + 1) S ↔ x % m ∈ S ∧ x / m ^ k ∈ liftBlock k m e S := by
-  sorry
+  have hmk : 0 < m ^ k := Nat.pow_pos hm
+  have hexp : k * e + k = k * (e + 1) := by ring
+  have hpowsplit : m ^ (k * e) * m ^ k = m ^ (k * (e + 1)) := by
+    rw [← pow_add, hexp]
+  have hsize : x < m ^ (k * (e + 1)) ↔ x / m ^ k < m ^ (k * e) := by
+    rw [Nat.div_lt_iff_lt_mul hmk, hpowsplit]
+  rw [mem_liftBlock, mem_liftBlock, hsize]
+  constructor
+  · rintro ⟨hlt, hdig⟩
+    refine ⟨by simpa [digit] using hdig 0 (by omega), hlt, fun j hj => ?_⟩
+    have h := hdig (j + 1) (by omega)
+    rwa [show k * (j + 1) = k * j + k by ring, digit_add_pow] at h
+  · rintro ⟨h0, hlt, hdig⟩
+    refine ⟨hlt, fun j hj => ?_⟩
+    cases j with
+    | zero => simpa [digit] using h0
+    | succ j =>
+      rw [show k * (j + 1) = k * j + k by ring, digit_add_pow]
+      exact hdig j (by omega)
 
 /-- The bottom level, counted: of the `m ^ k` residues below `m ^ k`, exactly
 `|S| · m^{k-1}` have their last digit in `S` — `k - 1` free digits times the constrained
@@ -519,7 +632,39 @@ one. -/
 private theorem base_count (k m : ℕ) (hk : 1 ≤ k) (hm : 0 < m) (S : Finset ℕ)
     (hS : ∀ s ∈ S, s < m) :
     ((Finset.range (m ^ k)).filter (fun u => u % m ∈ S)).card = S.card * m ^ (k - 1) := by
-  sorry
+  have hsplit : m ^ k = m * m ^ (k - 1) := by
+    rw [← pow_succ']
+    congr 1
+    omega
+  have hcard : S.card * m ^ (k - 1) = (S ×ˢ Finset.range (m ^ (k - 1))).card := by
+    rw [Finset.card_product, Finset.card_range]
+  rw [hcard]
+  refine (Finset.card_nbij' (fun p => p.1 + m * p.2) (fun u => (u % m, u / m)) ?_ ?_ ?_ ?_).symm
+  · rintro ⟨s, t⟩ hst
+    simp only [Finset.coe_product, Set.mem_prod, Finset.mem_coe, Finset.mem_range] at hst
+    simp only [Finset.coe_filter, Set.mem_ofPred_eq, Finset.mem_range]
+    have hs := hS s hst.1
+    refine ⟨?_, ?_⟩
+    · calc s + m * t < m + m * t := by omega
+        _ = m * (t + 1) := by ring
+        _ ≤ m * m ^ (k - 1) := Nat.mul_le_mul_left m hst.2
+        _ = m ^ k := hsplit.symm
+    · rw [Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt hs]
+      exact hst.1
+  · intro u hu
+    simp only [Finset.coe_filter, Set.mem_ofPred_eq, Finset.mem_range] at hu
+    simp only [Finset.coe_product, Set.mem_prod, Finset.mem_coe, Finset.mem_range]
+    refine ⟨hu.2, Nat.div_lt_of_lt_mul ?_⟩
+    have hlt := hu.1
+    rw [hsplit] at hlt
+    exact hlt
+  · rintro ⟨s, t⟩ hst
+    simp only [Finset.coe_product, Set.mem_prod, Finset.mem_coe, Finset.mem_range] at hst
+    have hs := hS s hst.1
+    simp [Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt hs, Nat.add_mul_div_left _ _ hm,
+      Nat.div_eq_of_lt hs]
+  · intro u hu
+    exact Nat.mod_add_div u m
 
 /-- The size count for `m ≥ 2`, where the digit-string bijection runs: a residue below
 `m ^ (k * (e + 1))` splits as a bottom group of `k` digits — one constrained to `S`, the
@@ -527,13 +672,104 @@ other `k - 1` free — times a residue below `m ^ (k * e)`. -/
 private theorem liftBlock_card_of_two_le (k m e : ℕ) (S : Finset ℕ) (hk : 1 ≤ k) (hm : 2 ≤ m)
     (hS : ∀ s ∈ S, s < m) :
     (liftBlock k m e S).card = (m ^ (k - 1) * S.card) ^ e := by
-  sorry
+  have hm0 : 0 < m := by omega
+  have hmk : 0 < m ^ k := Nat.pow_pos hm0
+  have hmdvd : m ∣ m ^ k := dvd_pow_self m (by omega)
+  have hsplit : ∀ u v : ℕ, u < m ^ k →
+      (u + m ^ k * v) % m ^ k = u ∧ (u + m ^ k * v) / m ^ k = v := by
+    intro u v hu
+    refine ⟨by rw [Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt hu], ?_⟩
+    rw [Nat.add_mul_div_left _ _ hmk, Nat.div_eq_of_lt hu, Nat.zero_add]
+  induction e with
+  | zero =>
+    have hset : liftBlock k m 0 S = {0} := by
+      ext x
+      rw [mem_liftBlock]
+      simp
+    rw [hset]
+    simp
+  | succ e ih =>
+    have hbij : (liftBlock k m (e + 1) S).card
+        = (((Finset.range (m ^ k)).filter (fun u => u % m ∈ S)) ×ˢ liftBlock k m e S).card := by
+      refine Finset.card_nbij' (fun x => (x % m ^ k, x / m ^ k))
+        (fun p => p.1 + m ^ k * p.2) ?_ ?_ ?_ ?_
+      · intro x hx
+        simp only [Finset.mem_coe] at hx ⊢
+        rw [mem_liftBlock_succ k m e S hk hm0] at hx
+        rw [Finset.mem_product, Finset.mem_filter, Finset.mem_range]
+        refine ⟨⟨Nat.mod_lt _ hmk, ?_⟩, hx.2⟩
+        rw [Nat.mod_mod_of_dvd _ hmdvd]
+        exact hx.1
+      · rintro ⟨u, v⟩ huv
+        simp only [Finset.mem_coe] at huv ⊢
+        rw [Finset.mem_product, Finset.mem_filter, Finset.mem_range] at huv
+        obtain ⟨⟨hult, huS⟩, hv⟩ := huv
+        obtain ⟨hmod, hdiv⟩ := hsplit u v hult
+        rw [mem_liftBlock_succ k m e S hk hm0, hdiv]
+        refine ⟨?_, hv⟩
+        rw [← Nat.mod_mod_of_dvd _ hmdvd, hmod]
+        exact huS
+      · intro x _
+        exact Nat.mod_add_div x (m ^ k)
+      · rintro ⟨u, v⟩ huv
+        simp only [Finset.mem_coe] at huv
+        rw [Finset.mem_product, Finset.mem_filter, Finset.mem_range] at huv
+        obtain ⟨hmod, hdiv⟩ := hsplit u v huv.1.1
+        simp [hmod, hdiv]
+    rw [hbij, Finset.card_product, base_count k m hk hm0 S hS, ih]
+    ring
 
 /-- The size count `|C(k, m, S, e)| = (m^{k-1} t)^e`: `e (k-1)` free digits and `e` digits
 from `S`. The degenerate moduli `m ≤ 1` are settled by inspection, `hS` having collapsed
 `S` to `∅` or `{0}`. -/
 theorem liftBlock_card (k m e : ℕ) (S : Finset ℕ) (hk : 1 ≤ k) (hS : ∀ s ∈ S, s < m) :
     (liftBlock k m e S).card = (m ^ (k - 1) * S.card) ^ e := by
-  sorry
+  rcases Nat.lt_or_ge m 2 with hm | hm
+  · rcases Nat.eq_zero_or_pos e with rfl | he
+    · -- `e = 0`: the block is the single residue `0`, whatever `k`, `m` and `S` are.
+      have h0 : liftBlock k m 0 S = {0} := by
+        ext x
+        rw [mem_liftBlock, Finset.mem_singleton]
+        exact ⟨fun h => by simpa using h.1,
+          fun h => ⟨by simp [h], fun j hj => absurd hj (by omega)⟩⟩
+      rw [h0]
+      simp
+    · have hke : k * e ≠ 0 := Nat.mul_ne_zero (by omega) (by omega)
+      interval_cases m
+      · -- `m = 0`: `hS` empties `S`, and there are no residues below `0 ^ (k * e) = 0`.
+        have hSe : S = ∅ := Finset.eq_empty_of_forall_notMem fun s hs => by
+          have := hS s hs; omega
+        have hb : liftBlock k 0 e S = ∅ := by
+          refine Finset.eq_empty_of_forall_notMem fun x hx => ?_
+          have h := ((mem_liftBlock k 0 e S x).mp hx).1
+          rw [zero_pow hke] at h
+          omega
+        rw [hb, hSe]
+        simp [zero_pow (by omega : e ≠ 0)]
+      · -- `m = 1`: every digit is `0`, so `S` is `{0}` or `∅` and the block follows suit.
+        by_cases h0 : (0 : ℕ) ∈ S
+        · have hS1 : S = {0} :=
+            Finset.eq_singleton_iff_unique_mem.mpr ⟨h0, fun x hx => by have := hS x hx; omega⟩
+          subst hS1
+          have hb : liftBlock k 1 e ({0} : Finset ℕ) = {0} := by
+            ext x
+            rw [mem_liftBlock, Finset.mem_singleton]
+            refine ⟨fun h => by simpa using h.1, fun h => ⟨by simp [h], fun j hj => ?_⟩⟩
+            simp [digit, Nat.mod_one]
+          rw [hb]
+          simp
+        · have hSe : S = ∅ := by
+            refine Finset.eq_empty_of_forall_notMem fun s hs => h0 ?_
+            have := hS s hs
+            have hs0 : s = 0 := by omega
+            exact hs0 ▸ hs
+          subst hSe
+          have hb : liftBlock k 1 e (∅ : Finset ℕ) = ∅ := by
+            refine Finset.eq_empty_of_forall_notMem fun x hx => ?_
+            have h := ((mem_liftBlock k 1 e ∅ x).mp hx).2 0 he
+            simp at h
+          rw [hb]
+          simp [zero_pow (by omega : e ≠ 0)]
+  · exact liftBlock_card_of_two_le k m e S hk hm hS
 
 end KthPower
