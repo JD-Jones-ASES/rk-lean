@@ -223,12 +223,16 @@ directed method says nothing new there. At `k = 2` the best published exponent i
 `0.752796455875…`, by the directed method itself, above the `0.733411797040…` of the transfer at
 `m = 205` (Beigel–Gasarch, arXiv:0804.4892; Lewko 2015, Theorem 3).
 
-**A ceiling the directed method escapes — cited context, outside the formal development.** Nothing
-in this paragraph is a theorem of this repository, and none of it is formalized here. Every
-*independent*-residue-set construction at square-free `m` is capped. By the Chinese remainder
-theorem the Cayley graph of `ℤ/m` on `±`(k-th powers) is the strong product of the per-prime
-Cayley graphs; `ϑ` bounds the independence number and is multiplicative under the strong product,
-so `log_m r_k(m) ≤ max_{p ∣ m} log_p ϑ` and the transfer exponent cannot exceed
+**A ceiling the directed method escapes — cited context, outside the formal development; scope
+corrected 2026-09-29.** Nothing in this paragraph is a theorem of this repository, and none of it is
+formalized here. Every *independent*-residue-set construction at square-free `m` is capped when at
+most one prime `p ∣ m` has `−1` outside the k-th powers mod `p` (for `k = 2`: at most one
+`p ≡ 3 (mod 4)`; for odd `k`: every `m`). For such `m`, by the Chinese remainder theorem the Cayley
+graph of `ℤ/m` on `±`(k-th powers) is the strong product of the per-prime Cayley graphs — with two
+or more such primes it is a union of two products, not a product (`{0, 2}` is independent mod `21`
+although adjacent in the product), and the cap below is then Ruzsa's open conjecture `|R| ≤ √m`
+rather than a theorem. In the product case `ϑ` bounds the independence number and is multiplicative
+under the strong product, so `log_m r_k(m) ≤ max_{p ∣ m} log_p ϑ` and the transfer exponent cannot exceed
 `(k − 1 + c_k)/k` with `c_k = max_p log_p ϑ(Cay(ℤ/p, ± k-th powers))`, `ϑ` the theta function of
 Lovász, *On the Shannon capacity of a graph*, IEEE Trans. Inform. Theory **25** (1979), no. 1,
 1–7, doi:10.1109/TIT.1979.1055985. Each prime graph is edge-transitive, so its `ϑ` is the Lovász ratio bound `−n λ_min/(λ_max − λ_min)` in
